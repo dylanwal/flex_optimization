@@ -129,7 +129,7 @@ class Method(ABC):
 
         self.result = self.data.iloc[best_result_index].to_dict()
 
-        logger.info(f"\nbest result: {self.result}")
+        logger.info(f"\nBest Result: {self.result}")
 
 
 class PassiveMethod(Method, ABC):
@@ -160,7 +160,7 @@ class PassiveMethod(Method, ABC):
 
 
 class StopCriteria:
-    def evaluate(self, *args, **kwargs) -> bool:
+    def evaluate(self, method: Method, *args, **kwargs) -> bool:
         """ True = Continue; False = Stop """
         pass
 
@@ -169,7 +169,7 @@ class ActiveMethod(Method, ABC):
 
     def __init__(self,
                  problem: Problem,
-                 stop_criterion: Union[StopCriteria, list[StopCriteria]],
+                 stop_criterion: Union[StopCriteria, list[StopCriteria], list[list[StopCriteria]]],
                  multiprocess: Union[bool, int] = False):
         if not isinstance(stop_criterion, list):
             stop_criterion = [stop_criterion]
@@ -201,9 +201,23 @@ class ActiveMethod(Method, ABC):
     def _check_stop_criterion(self):
         """ True = Continue; False = Stop """
         for criteria in self.stop_criterion:
-            if not criteria.evaluate(self):
+            if isinstance(criteria, list):
+                if not self._multi_stop_criterion(criteria):
+                    self.stop_criteria = criteria
+                    logger.info(f"Stop Criteria met:{criteria}")
+                    return False
+
+            elif not criteria.evaluate(self):
                 self.stop_criteria = criteria
                 logger.info(f"Stop Criteria met:{criteria}")
                 return False
 
+
         return True
+
+    def _multi_stop_criterion(self, criterion):
+        stopping_results = []
+        for criteria in criterion:
+            stopping_results.append(criteria.evaluate(self))
+
+        return any(stopping_results)

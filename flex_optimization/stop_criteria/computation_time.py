@@ -3,7 +3,7 @@ import time
 from flex_optimization.problem_statement import StopCriteria
 
 
-class StopCritComputationTime(StopCriteria):
+class StopComputationTime(StopCriteria):
     def __init__(self, duration: float = 120):
         self.duration = duration  # seconds
         self.start_time = time.monotonic()  # seconds

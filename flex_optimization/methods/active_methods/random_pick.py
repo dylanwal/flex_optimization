@@ -10,7 +10,7 @@ class MethodRandom(ActiveMethod):
 
     def __init__(self,
              problem: Problem,
-             stop_criteria: Union[StopCriteria, list[StopCriteria]],
+             stop_criteria: Union[StopCriteria, list[StopCriteria], list[list[StopCriteria]]],
              multiprocess: Union[bool, int] = False):
 
         super().__init__(problem, stop_criteria, multiprocess)
