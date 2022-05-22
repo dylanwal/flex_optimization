@@ -1,0 +1,2 @@
+from flex_optimization.stop_criteria.function_evaluation import StopFunctionEvaluation
+from flex_optimization.stop_criteria.computation_time import StopCritComputationTime

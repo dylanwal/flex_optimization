@@ -1,0 +1,3 @@
+from flex_optimization.methods.passive_methods.factorial import MethodFactorial
+
+from flex_optimization.methods.active_methods.random_pick import MethodRandom
