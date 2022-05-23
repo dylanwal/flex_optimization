@@ -14,14 +14,23 @@ def main():
         optimization_type=True
     )
 
-    # method = fo_m.MethodFactorial(problem=problem, levels=10)
-    # method = fo_m.MethodRandom(problem, fo_s.StopFunctionEvaluation(100))
+    # STOP CRITERIA
     # method = fo_m.MethodRandom(problem, fo_s.StopComputationTime(1))
     # method = fo_m.MethodRandom(problem, [fo_s.StopComputationTime(1), fo_s.StopFunctionEvaluation(100)])
     # method = fo_m.MethodRandom(problem, [[fo_s.StopComputationTime(0.1), fo_s.StopFunctionEvaluation(1000)]])
     # method = fo_m.MethodRandom(problem, fo_s.StopRelativeChange(cut_off_steps=10))
     # method = fo_m.MethodRandom(problem, fo_s.StopAbsoluteChange(cut_off_value=0.05, cut_off_steps=10))
-    method = fo_m.MethodRandom(problem, fo_s.StopRate(cut_off_rate=0.05, prior_steps=5, cut_off_steps=2))
+    # method = fo_m.MethodRandom(problem, fo_s.StopRate(cut_off_rate=0.05, prior_steps=5, cut_off_steps=2))
+
+    # METHODS
+    # method = fo_m.MethodFactorial(problem=problem, levels=10)
+    # method = fo_m.MethodCovary(problem=problem, levels=10)
+    method = fo_m.MethodMultiCovary(problem=problem, levels=10)
+    # method = fo_m.MethodRandom(problem, fo_s.StopFunctionEvaluation(100))
+    # method = fo_m.MethodSobol(problem, fo_s.StopFunctionEvaluation(100))
+    # method = fo_m.MethodLatinHypercube(problem, fo_s.StopFunctionEvaluation(100))
+    # method = fo_m.MethodHalton(problem, fo_s.StopFunctionEvaluation(100))
+    # method = fo_m.MethodMultiNormal(problem, fo_s.StopFunctionEvaluation(100))
     method.run()
 
     vis = fo.OptimizationVis(problem, method.data)

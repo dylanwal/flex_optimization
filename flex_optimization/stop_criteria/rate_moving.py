@@ -4,6 +4,7 @@ from flex_optimization.problem_statement import StopCriteria, Method
 
 class StopRelativeRate(StopCriteria):
     def __init__(self, cut_off_rate: float = 0.01, prior_steps: int = 3, cut_off_steps: int = 3):
+        raise NotImplementedError("coming soon")
         self.cut_off_rate = cut_off_rate
         self.prior_steps = prior_steps
         self.cut_off_steps = cut_off_steps

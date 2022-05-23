@@ -35,6 +35,12 @@ class DiscreteVariable(Variable):
             items = self.items[:3] + ["..."]
         return f"{self.name} = {len(self)}; {items}"
 
+    def __getattr__(self, index_: Union[int, slice]):
+        return self.items[index_]
+
+    def __iter__(self):
+        return self.items
+
 
 class ContinuousVariable(Variable):
 
