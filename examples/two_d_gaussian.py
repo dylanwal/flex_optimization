@@ -3,7 +3,7 @@ import flex_optimization.methods as fo_m
 import flex_optimization.stop_criteria as fo_s
 import flex_optimization.problems as fo_p
 
-fo.logger.setLevel(fo.logger.MONITOR)
+fo.logger.setLevel(fo.logger.DEBUG)
 
 
 def main():
@@ -25,12 +25,20 @@ def main():
     # METHODS
     # method = fo_m.MethodFactorial(problem=problem, levels=10)
     # method = fo_m.MethodCovary(problem=problem, levels=10)
-    method = fo_m.MethodMultiCovary(problem=problem, levels=10)
+    # method = fo_m.MethodMultiCovary(problem=problem, levels=10)
+    # method = fo_m.MethodStar(problem=problem, levels=3)
     # method = fo_m.MethodRandom(problem, fo_s.StopFunctionEvaluation(100))
     # method = fo_m.MethodSobol(problem, fo_s.StopFunctionEvaluation(100))
     # method = fo_m.MethodLatinHypercube(problem, fo_s.StopFunctionEvaluation(100))
     # method = fo_m.MethodHalton(problem, fo_s.StopFunctionEvaluation(100))
     # method = fo_m.MethodMultiNormal(problem, fo_s.StopFunctionEvaluation(100))
+    # method = fo_m.MethodBODragon(problem, stop_criteria=fo_s.StopFunctionEvaluation(20))
+    method = fo_m.MethodBFGS(problem, stop_criteria=fo_s.StopFunctionEvaluation(20), x0=[3, 3])
+
+    # multiprocessing
+    # method = fo_m.MethodBODragon(problem, stop_criteria=fo_s.StopFunctionEvaluation(20), multiprocess=True,
+    #                              options=dict(build_new_model_every=3))
+
     method.run()
 
     vis = fo.OptimizationVis(problem, method.data)

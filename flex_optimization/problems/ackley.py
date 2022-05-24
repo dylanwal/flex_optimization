@@ -3,16 +3,20 @@ from typing import Union
 import numpy as np
 
 
-def nd_gaussian(args,
+def ackley(args,
                 sigma: Union[float, list[float]] = None,
                 pre_factor: float = 1,
                 center:  Union[float, list[float]] = None) -> np.ndarray:
     """
-    n-dimensional Gaussian function
+    Ackley function
+
+    References
+    ----------
+    Ackley, D. H. (1987) "A connectionist machine for genetic hillclimbing", Kluwer Academic Publishers, Boston MA.
 
     Features:
     --------
-    * smooth optimization
+    * slightly rough, but mostly smooth optimization
     * single minima at center
 
     Parameters
@@ -20,12 +24,6 @@ def nd_gaussian(args,
     args: array
         [x[:], y[:], z[:], ...]
         the number of values determines dimensionality
-    sigma: float, list[float]
-        standard deviation
-    pre_factor: float
-        pre-factor
-    center: float, list[float]
-        center of distribution
 
     Returns
     -------
@@ -41,27 +39,21 @@ def nd_gaussian(args,
         d = len(args)
     else:  # np.ndarray
         d = args.shape[1]
+    if not isinstance(args, (list, tuple, np.ndarray)):
+        raise ValueError("Invalid args.")
 
-    if sigma is not None:
-        if len(sigma) != d:
-            raise ValueError(f"args suggests a {d}-distribution, but {len(sigma)} sigma where provided.")
-    else:
-        sigma = np.ones(d)
+    first_sum = 0
+    second_sum = 0
+    if isinstance(args, np.ndarray) and args.shape[1] >= 2:
+        for i in range(args.shape[1]):
+            first_sum += args[:, i]**2
+            second_sum += np.cos(2 * np.pi * args[:, i])
+    if isinstance(args, list):
+        for x in args:
+            first_sum += x**2
+            second_sum += np.cos(2 * np.pi * x)
 
-    if center is not None:
-        if len(center) != d:
-            raise ValueError(f"args suggests a {d}-distribution, but {len(center)} center where provided.")
-    else:
-        center = np.zeros(d)
-
-    def single_dim_exponent(x, x0, sigma_):
-        return (x-x0)**2/(2*sigma_**2)
-
-    exponent = 0
-    for i in range(d):
-        exponent += single_dim_exponent(args[i], center[i], sigma[i])
-
-    return pre_factor*np.exp(-exponent)
+    return -20.0*np.exp(-0.2*np.sqrt(first_sum/d)) - np.exp(second_sum/d) + 20 + np.e
 
 
 def local_run():
@@ -72,7 +64,7 @@ def local_run():
 
     xx = xx.T.reshape(n*n)
     yy = yy.T.reshape(n*n)
-    zz = nd_gaussian([xx, yy])
+    zz = ackley([xx, yy])
 
     import plotly.graph_objs as go
     fig = go.Figure(go.Surface(x=x, y=y, z=zz.T.reshape(n, n)))
@@ -80,7 +72,7 @@ def local_run():
 
 
 def local_run2():
-    n = 7
+    n = 20
     x = np.linspace(-5, 5, n)
     y = np.linspace(-5, 5, n)
     z = np.linspace(-5, 5, n)
@@ -89,7 +81,7 @@ def local_run2():
     xx = xx.T.reshape(n*n*n)
     yy = yy.T.reshape(n*n*n)
     zz = zz.T.reshape(n*n*n)
-    aa = nd_gaussian([xx, yy, zz], sigma=[2, 2, 2])
+    aa = ackley([xx, yy, zz], sigma=[2, 2, 2])
 
     import plotly.express as px
     import pandas as pd

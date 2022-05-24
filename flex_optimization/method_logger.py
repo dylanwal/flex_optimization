@@ -67,7 +67,7 @@ class LogFormatter(logging.Formatter):
 
         # Replace the original format with one customized by logging level
         if record.levelno == logging.DEBUG:
-            self._style._fmt = f"\t \t{color_codes['white']}%(msg)s{color_codes['reset']}"
+            self._style._fmt = f"\t{color_codes['cyan']}%(msg)s{color_codes['reset']}"
         elif record.levelno == logging.MONITOR:
             self._style._fmt = f"\t{color_codes['white']}%(msg)s{color_codes['reset']}"
         elif record.levelno == logging.INFO:

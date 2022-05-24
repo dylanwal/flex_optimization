@@ -8,7 +8,7 @@ from flex_optimization.problem_statement import ActiveMethod, Problem, StopCrite
     ContinuousVariable, DiscreteVariable
 
 
-def map_number(old_value, old_min, old_max, new_min, new_max) -> float:    # Figure out how 'wide' each range is
+def map_number(old_value, old_min, old_max, new_min, new_max) -> float:
     if old_value < old_min:
         return new_min
     if old_value > old_max:
@@ -30,15 +30,19 @@ class MethodMultiNormal(ActiveMethod):
         self.sobol = MultivariateNormalQMC(mean=[0]*len(problem.variables))
         super().__init__(problem, stop_criteria, multiprocess)
 
+    @staticmethod
+    def _re_map(var, value):
+        if isinstance(var, ContinuousVariable):
+            return map_number(value, -3, 3, var.min_, var.max_)
+        elif isinstance(var, DiscreteVariable):
+            return var.item[int(map_number(value, -3, 3, 0, len(var)-1))]
+        else:
+            raise NotImplementedError
+
     def get_point(self) -> list:
         var = self.sobol.random()[0]
         out = []
         for i, v in enumerate(self.problem.variables):
-            if isinstance(v, ContinuousVariable):
-                out.append(map_number(var[i], -3, 3, v.min_, v.max_))
-            elif isinstance(v, DiscreteVariable):
-                out.append(v.item[int(map_number(var[i], -3, 3, 0, len(v)-1))])
-            else:
-                raise NotImplementedError
+            out.append(self._re_map(v, var[i]))
 
         return out

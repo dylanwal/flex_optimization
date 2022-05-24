@@ -88,6 +88,18 @@ class Problem(ABC):
         logger.info(f"{type(self).__name__} | {repr(self)}")
 
     @property
+    def num_variables(self):
+        return len(self.variables)
+
+    @property
+    def num_variables_discrete(self):
+        return len([True for var in self.variables if isinstance(var, DiscreteVariable)])
+
+    @property
+    def num_variables_continuous(self):
+        return len([True for var in self.variables if isinstance(var, ContinuousVariable)])
+
+    @property
     def variable_names(self) -> list[str]:
         return [var.name for var in self.variables]
 
@@ -181,10 +193,10 @@ class ActiveMethod(Method, ABC):
             stop_criterion = [stop_criterion]
         self.stop_criterion: list[StopCriteria] = stop_criterion
         self.stop_criteria = None
-        self._flag_init = False
+        self._flag_init = False  # False = Not initialized
         super().__init__(problem, multiprocess)
 
-    def inti_method(self):
+    def method_init(self):
         pass
 
     @abstractmethod
@@ -192,20 +204,58 @@ class ActiveMethod(Method, ABC):
         pass
 
     def run(self, guard_value: int = 1_000):
-        for _ in range(guard_value):
+        """ Run optimization. """
+        self.run_steps(guard_value)
+        self.get_best_result()
+
+    def run_steps(self, algo_steps: int = 1):
+        """
+        Step through optimization
+
+        Parameters
+        ----------
+        algo_steps: int
+            algorithm steps to preform
+            * may be multiple function evaluations
+            * initialization is one algorithm step
+
+        Returns
+        -------
+
+        """
+        if self.multiprocess:
+            self._multi_run_step(algo_steps)
+            return
+
+        # main optimization loop
+        for _ in range(algo_steps):
             point = self.get_point()
             result = self.problem.evaluate(point)
-
-            # save data
-            self.data.loc[0 if pd.isnull(self.data.index.max()) else self.data.index.max() + 1] = point + [result]
-
+            self._tell(point, result)
+            self._save_data(point, result)
             if not self._check_stop_criterion():
                 break
 
-        self.get_best_result()
+    def _save_data(self, point, result):
+        if isinstance(point[0], list):
+            for p, r in zip(point, result):
+                self.data.loc[0 if pd.isnull(self.data.index.max()) else self.data.index.max() + 1] = p + [r]
+        else:
+            self.data.loc[0 if pd.isnull(self.data.index.max()) else self.data.index.max() + 1] = point + [result]
+
+    def _multi_run_step(self, step: int):
+        """ Sub-classed for multiprocessing capabilities. """
+        raise NotImplementedError("Multi-processing not implemented yet.")
+
+    def _tell(self, point, result):
+        """ Update optimizer with new values"""
+        pass
 
     def _check_stop_criterion(self):
-        """ True = Continue; False = Stop """
+        """
+        Check stop criterion
+        True = Continue; False = Stop
+        """
         for criteria in self.stop_criterion:
             if isinstance(criteria, list):
                 if not self._multi_stop_criterion(criteria):
@@ -218,10 +268,10 @@ class ActiveMethod(Method, ABC):
                 logger.info(f"Stop Criteria met:{criteria}")
                 return False
 
-
         return True
 
     def _multi_stop_criterion(self, criterion):
+        """ If multiple stop criterion, check to see if all are False. ('and' stop criteria)"""
         stopping_results = []
         for criteria in criterion:
             stopping_results.append(criteria.evaluate(self))
