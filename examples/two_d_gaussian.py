@@ -8,9 +8,9 @@ fo.logger.setLevel(fo.logger.DEBUG)
 
 def main():
     problem = fo.Problem(
-        func=fo_p.two_d_gaussian,
+        func=fo_p.nd_gaussian,
         variables=[fo.ContinuousVariable(-5, 5, name="x"), fo.ContinuousVariable(-5, 5, name="y")],
-        kwargs=dict(x_o=0.2342, y_o=0.1234, sigma_x=3),
+        kwargs=dict(center=[0.2342, 0.1234], sigma=[1, 3]),
         optimization_type=True
     )
 

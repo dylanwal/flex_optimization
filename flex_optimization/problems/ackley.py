@@ -1,12 +1,8 @@
-from typing import Union
 
 import numpy as np
 
 
-def ackley(args,
-                sigma: Union[float, list[float]] = None,
-                pre_factor: float = 1,
-                center:  Union[float, list[float]] = None) -> np.ndarray:
+def ackley(args) -> np.ndarray:
     """
     Ackley function
 
@@ -18,6 +14,7 @@ def ackley(args,
     --------
     * slightly rough, but mostly smooth optimization
     * single minima at center
+    * typical x range [-5, 5]
 
     Parameters
     ----------
@@ -38,9 +35,10 @@ def ackley(args,
     if isinstance(args, (list, tuple)):
         d = len(args)
     else:  # np.ndarray
-        d = args.shape[1]
-    if not isinstance(args, (list, tuple, np.ndarray)):
-        raise ValueError("Invalid args.")
+        if len(args.shape) == 1:
+            d = args.size
+        else:
+            d = args.shape[1]
 
     first_sum = 0
     second_sum = 0
@@ -81,7 +79,7 @@ def local_run2():
     xx = xx.T.reshape(n*n*n)
     yy = yy.T.reshape(n*n*n)
     zz = zz.T.reshape(n*n*n)
-    aa = ackley([xx, yy, zz], sigma=[2, 2, 2])
+    aa = ackley([xx, yy, zz])
 
     import plotly.express as px
     import pandas as pd

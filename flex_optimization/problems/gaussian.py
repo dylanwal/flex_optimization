@@ -40,7 +40,10 @@ def nd_gaussian(args,
     if isinstance(args, (list, tuple)):
         d = len(args)
     else:  # np.ndarray
-        d = args.shape[1]
+        if len(args.shape) == 1:
+            d = args.size
+        else:
+            d = args.shape[1]
 
     if sigma is not None:
         if len(sigma) != d:
