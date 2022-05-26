@@ -8,7 +8,8 @@ try:
     from dragonfly.exd.experiment_caller import CPFunctionCaller, CPMultiFunctionCaller
     from dragonfly.opt.gp_bandit import CPGPBandit
 except ImportError:
-    print("To use this method you will need to install DragonFly (pip install dragonfly-opt).\n"
+    raise ImportError("Flex-optimization: Optional requirement."
+                      "\n\nTo use this method you will need to install DragonFly (pip install dragonfly-opt).\n"
           "For more information see: https://dragonfly-opt.readthedocs.io/en/master/install/\n")
 
 from flex_optimization.problem_statement import ActiveMethod, Problem, StopCriteria, ContinuousVariable, \
