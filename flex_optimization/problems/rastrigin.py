@@ -1,6 +1,8 @@
 
 import numpy as np
 
+from flex_optimization.problems.utils import get_dimensionality
+
 
 def rastrigin(args, constant: float = 10) -> np.ndarray:
     """
@@ -30,14 +32,7 @@ def rastrigin(args, constant: float = 10) -> np.ndarray:
     if not isinstance(args, (list, tuple, np.ndarray)):
         raise ValueError("Invalid args.")
 
-    # determine dimensionality
-    if isinstance(args, (list, tuple)):
-        d = len(args)
-    else:  # np.ndarray
-        if len(args.shape) == 1:
-            d = args.size
-        else:
-            d = args.shape[1]
+    d = get_dimensionality(args)
 
     sum_ = 0
     if isinstance(args, np.ndarray) and args.shape[1] >= 2:

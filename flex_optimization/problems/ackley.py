@@ -1,6 +1,8 @@
 
 import numpy as np
 
+from flex_optimization.problems.utils import get_dimensionality
+
 
 def ackley(args) -> np.ndarray:
     """
@@ -31,14 +33,7 @@ def ackley(args) -> np.ndarray:
     if not isinstance(args, (list, tuple, np.ndarray)):
         raise ValueError("Invalid args.")
 
-    # determine dimensionality
-    if isinstance(args, (list, tuple)):
-        d = len(args)
-    else:  # np.ndarray
-        if len(args.shape) == 1:
-            d = args.size
-        else:
-            d = args.shape[1]
+    d = get_dimensionality(args)
 
     first_sum = 0
     second_sum = 0

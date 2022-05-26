@@ -1,8 +1,10 @@
 
 import numpy as np
 
+from flex_optimization.problems.utils import get_dimensionality
 
-def shpere(args) -> np.ndarray:
+
+def sphere(args) -> np.ndarray:
     """
     Sphere function
 
@@ -31,14 +33,7 @@ def shpere(args) -> np.ndarray:
     if not isinstance(args, (list, tuple, np.ndarray)):
         raise ValueError("Invalid args.")
 
-    # determine dimensionality
-    if isinstance(args, (list, tuple)):
-        d = len(args)
-    else:  # np.ndarray
-        if len(args.shape) == 1:
-            d = args.size
-        else:
-            d = args.shape[1]
+    d = get_dimensionality(args)
 
     sum_ = 0
     if isinstance(args, np.ndarray) and args.shape[1] >= 2:
@@ -59,7 +54,7 @@ def local_run():
 
     xx = xx.T.reshape(n*n)
     yy = yy.T.reshape(n*n)
-    zz = ackley([xx, yy])
+    zz = sphere([xx, yy])
 
     import plotly.graph_objs as go
     fig = go.Figure(go.Surface(x=x, y=y, z=zz.T.reshape(n, n)))
@@ -76,7 +71,7 @@ def local_run2():
     xx = xx.T.reshape(n*n*n)
     yy = yy.T.reshape(n*n*n)
     zz = zz.T.reshape(n*n*n)
-    aa = ackley([xx, yy, zz])
+    aa = sphere([xx, yy, zz])
 
     import plotly.express as px
     import pandas as pd
