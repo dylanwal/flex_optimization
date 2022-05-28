@@ -2,7 +2,6 @@ import json
 from typing import Any
 
 import flex_optimization as fo
-import flex_optimization.problems as fo_p
 
 
 class ProblemEncoder(json.JSONEncoder):
@@ -23,7 +22,7 @@ def to_two_col_table(dict_: dict, header: tuple[str] = ("key", "value")) -> str:
     return text
 
 
-def write_problem(problem: fo_p.ProblemClassification) -> str:
+def write_problem(problem: fo.problems.ProblemClassification) -> str:
     text = ""
     text += f"# {problem.name}\n\n"
     text += to_two_col_table(problem.__dict__)
@@ -40,7 +39,7 @@ def main():
     text += "This directory contains collection of classic and non-classical test problems for optimization."
     text += "\n\n----\n\n"
 
-    problems = fo_p.ProblemClassification.population
+    problems = fo.problems.ProblemClassification.population
     for problem in problems:
         text += write_problem(problem)
         text += "\n----\n\n"

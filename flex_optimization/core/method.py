@@ -13,6 +13,9 @@ class Method(ABC):
 
         self.recorder.record(self.recorder.SETUP)
 
+    def __repr__(self):
+        return ""
+
     @abstractmethod
     def run(self):
         ...

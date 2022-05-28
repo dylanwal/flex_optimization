@@ -4,6 +4,13 @@ from flex_optimization.core.stop_criteria import StopCriteria
 
 
 class StopComputationTime(StopCriteria):
+    """
+    Stop Criteria: Computation Time
+
+    Stop the algorithm after 'duration' (time that has passed).
+    * It will finish current iteration before stopping.
+
+    """
     def __init__(self, duration: float = 120):
         self.duration = duration  # seconds
         self.start_time = time.monotonic()  # seconds

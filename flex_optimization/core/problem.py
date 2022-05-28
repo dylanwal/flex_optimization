@@ -35,6 +35,9 @@ class Problem(ABC):
         self.variables = variables
         self.type_ = type_
 
+    def __repr__(self):
+        return f"Find the {self.type_.name} of '{self.func.__name__}' with {self.num_variables} variables"
+
     @property
     def num_variables(self):
         return len(self.variables)

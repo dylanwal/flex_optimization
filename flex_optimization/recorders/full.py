@@ -44,7 +44,7 @@ class RecorderFull(Recorder):
         elif type_ == self.RUNNING:
             self._record_running()
         elif type_ == self.STOP:
-            self._record_stop()
+            self._record_stop(**kwargs)
         elif type_ == self.FINISH:
             self._record_finish()
         elif type_ == self.NOTES:
@@ -80,20 +80,16 @@ class RecorderFull(Recorder):
             self.data.append(np.hstack((point, result, metric)))
             logger.monitor(f"{self.num_data_points} | {point} --> {result} --> {metric}")
         self.num_data_points += 1
+        self._up_to_date = False
 
-    # def _record_stop(self):
-    #     pass
+    @staticmethod
+    def _record_stop(text: str):
+        logger.info(text)
 
     def _record_finish(self):
         self.end_time = datetime.now()
         logger.info(f"Calculation time: {self.duration}")
         time.sleep(0.1)
-        if self.problem.type_ == OptimizationType.MAX:
-            best_result_index = self.df["metric"].idxmax()
-        else:
-            best_result_index = self.df["metric"].idxmin()
-
-        self.best_result = self.df.iloc[best_result_index].to_dict()
 
         logger.info(f"\nBest Result: {self.best_result}")
 

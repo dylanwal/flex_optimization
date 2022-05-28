@@ -77,6 +77,7 @@ class ActiveMethod(Method, ABC):
             stop_criterion = [stop_criterion]
         self.stop_criterion: list[StopCriteria] = stop_criterion
         self.stop_criteria = None
+        self.iteration_count = 0
         self._flag_init = False  # False = Not initialized
         super().__init__(problem, multiprocess, recorder)
 
@@ -87,9 +88,11 @@ class ActiveMethod(Method, ABC):
     def get_point(self):
         pass
 
-    def run(self, guard_value: int = 1_000):
+    def run(self, guard_value: int = 1_000_000):
         """ Run optimization. """
+        self.recorder.record(self.recorder.RUNNING)
         self.run_steps(guard_value)
+        self.recorder.record(self.recorder.FINISH)
 
     def run_steps(self, algo_steps: int = 1):
         """
@@ -106,26 +109,35 @@ class ActiveMethod(Method, ABC):
         -------
 
         """
-        if self.multiprocess:
-            self._multi_run_step(algo_steps)
-            return
+        try:
+            if self.multiprocess:
+                self._multi_run_step(algo_steps)
+                return
 
-        # main optimization loop
-        for _ in range(algo_steps):
-            point = self.get_point()
-            result = self.problem.evaluate(point)
-            self._tell(point, result)
-            self._save_data(point, result)
-            if not self._check_stop_criterion():
-                break
+            # main optimization loop
+            for _ in range(algo_steps):
+                self.iteration_count += 1
+                point = self.get_point()
+                result = self.problem.evaluate(point)
+                metric = self.problem.metric(result)
+                self._tell(point, result, metric)
+                if not self._check_stop_criterion():
+                    break
+
+        except KeyboardInterrupt as e:
+            self.recorder._error_exit(e)
+
+        except Exception as e:
+            print(e)
+            self.recorder._error_exit(e)
 
     def _multi_run_step(self, step: int):
         """ Sub-classed for multiprocessing capabilities. """
         raise NotImplementedError("Multi-processing not implemented yet.")
 
-    def _tell(self, point, result):
+    def _tell(self, point, result, metric):
         """ Update optimizer with new values"""
-        pass
+        self.recorder.record(self.recorder.EVALUATION, point=point, result=result, metric=metric)
 
     def _check_stop_criterion(self):
         """
@@ -136,12 +148,12 @@ class ActiveMethod(Method, ABC):
             if isinstance(criteria, list):
                 if not self._multi_stop_criterion(criteria):
                     self.stop_criteria = criteria
-                    logger.info(f"Stop Criteria met:{criteria}")
+                    self.recorder.record(self.recorder.STOP, text=f"Stop Criteria met:{criteria}")
                     return False
 
             elif not criteria.evaluate(self):
                 self.stop_criteria = criteria
-                logger.info(f"Stop Criteria met:{criteria}")
+                self.recorder.record(self.recorder.STOP, text=f"Stop Criteria met:{criteria}")
                 return False
 
         return True
