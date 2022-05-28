@@ -6,6 +6,8 @@ def to_numpy_array(args) -> np.ndarray:
         raise ValueError("Invalid args.")
 
     if isinstance(args, np.ndarray):
+        if len(args.shape) == 1:
+            return np.array(args).reshape(1, 2)
         return args
 
     if not isinstance(args[0], (list, tuple, np.ndarray)):

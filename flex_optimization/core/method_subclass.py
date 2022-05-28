@@ -1,4 +1,3 @@
-import time
 from abc import ABC, abstractmethod
 
 from flex_optimization.core.recorder import Recorder
@@ -37,11 +36,6 @@ class PassiveMethod(Method, ABC):
             self.recorder.record(self.recorder.FINISH)
 
         except KeyboardInterrupt as e:
-            import warnings
-            from flex_optimization.core.utils import custom_formatwarning
-            warnings.formatwarning = custom_formatwarning
-
-            warnings.warn("\033[31m" + "KeyboardInterrupt" + "\033[0m")
             self.recorder._error_exit(e)
 
         except Exception as e:
@@ -55,25 +49,21 @@ class PassiveMethod(Method, ABC):
             self.recorder.record(self.recorder.EVALUATION, point=point, result=result, metric=metric)
 
     def _run_multiproessing(self, points):
-        import multiprocessing
-        from functools import partial
 
         def callback(results):
             point_, result = results
             metric = self.problem.metric(result)
             self.recorder.record(self.recorder.EVALUATION, point=point_, result=result, metric=metric)
 
-        with multiprocessing.Pool(self._get_pool_size()) as pool:
-            def error_callback(e):
-                print("error in a process.")
-                pool.terminate()
-
-            for point in points:
-                pool.apply_async(partial(temp_func, func=self.problem.evaluate), kwds=dict(point=point),
-                                 callback=callback, error_callback=error_callback)
-
-            pool.close()
-            pool.join()
+        from functools import partial
+        from flex_optimization.core.utils import PoolHandler
+        pool = PoolHandler(
+            func=partial(temp_func, func=self.problem.evaluate),
+            pool_size=self._get_pool_size(),
+            pool_points=points,
+            callback=callback
+        )
+        pool.run()
 
 
 class ActiveMethod(Method, ABC):

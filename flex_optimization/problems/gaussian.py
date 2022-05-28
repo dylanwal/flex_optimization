@@ -1,19 +1,15 @@
-import time
-from typing import Union
-from threading import Event
-import time
+
 import numpy as np
 
 from flex_optimization import OptimizationType
 from flex_optimization.problems import ProblemClassification
 from flex_optimization.problems.utils import to_numpy_array
 
-exit_ = Event()
 
 def nd_gaussian(args,
-                sigma: Union[float, list[float]] = None,
+                sigma: float | list[float] = None,
                 pre_factor: float = 1,
-                center:  Union[float, list[float]] = None) -> np.ndarray:
+                center: float | list[float] = None) -> np.ndarray:
     """
     n-dimensional Gaussian function
 
@@ -66,7 +62,6 @@ def nd_gaussian(args,
     for i in range(args.shape[1]):
         exponent += single_dim_exponent(args[:, i], center[i], sigma[i])
 
-    time.sleep(0.5)
     return pre_factor*np.exp(-exponent)
 
 

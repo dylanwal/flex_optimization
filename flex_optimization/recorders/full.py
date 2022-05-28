@@ -11,19 +11,30 @@ from flex_optimization.core.logger_ import logger
 class RecorderFull(Recorder):
     def __init__(self, problem=None, method=None):
         self.start_time = None
+        self.end_time = None
         self._first_eval = True
         self.num_data_points: int = 0
         super().__init__(problem, method)
+        logger.setLevel(logger.DEBUG)
 
-    def __enter__(self):
-        pass
+    @property
+    def duration(self):
+        return self.end_time - self.start_time
 
-    def __exit__(self, exc_type, exc_value, exc_tb):
-        print(exc_value)
-        print(exc_value)
-        print(exc_tb)
-        if exc_type is not None:
-            self.save("data_error")
+    def _error_exit(self, e):
+        """ Save data if something goes wrong in the middle of the optimization. """
+        from datetime import datetime
+        from flex_optimization.core.utils import custom_formatwarning
+
+        self._error = e
+        if len(self.data) > 1:
+            filename = f"data_error_export_{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+            logger.error(f"Error Occurred!!!!!!!! Data saved as '{filename}'")
+            self.save(filename)
+        else:
+            logger.error(f"Error Occurred!!!!!!!!")
+
+        raise e
 
     def record(self, type_: int, **kwargs):
         if type_ == self.EVALUATION:
@@ -74,6 +85,8 @@ class RecorderFull(Recorder):
     #     pass
 
     def _record_finish(self):
+        self.end_time = datetime.now()
+        logger.info(f"Calculation time: {self.duration}")
         time.sleep(0.1)
         if self.problem.type_ == OptimizationType.MAX:
             best_result_index = self.df["metric"].idxmax()

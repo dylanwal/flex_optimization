@@ -1,5 +1,3 @@
-import itertools
-from typing import Union
 
 import numpy as np
 
@@ -55,4 +53,6 @@ class MethodCovary(PassiveMethod):
     def get_points(self) -> list[list]:
         self._set_levels()
         args = [var.levels for var in self.problem.variables]
+
+        import itertools
         return list(map(list, itertools.zip_longest(*args, fillvalue=None)))

@@ -31,8 +31,8 @@ class Method(ABC):
             if recorder.method is None:
                 recorder.method = self
         else:
-            from flex_optimization.recorders.basic import RecorderBasic
-            recorder = RecorderBasic(self.problem, self)
+            from flex_optimization.recorders.full import RecorderFull
+            recorder = RecorderFull(self.problem, self)
 
         self.problem.recorder = recorder
         return recorder
