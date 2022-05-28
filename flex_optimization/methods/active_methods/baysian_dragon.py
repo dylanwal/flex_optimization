@@ -12,9 +12,10 @@ except ImportError:
                       "\n\nTo use this method you will need to install DragonFly (pip install dragonfly-opt).\n"
           "For more information see: https://dragonfly-opt.readthedocs.io/en/master/install/\n")
 
-from flex_optimization.problem_statement import ActiveMethod, Problem, StopCriteria, ContinuousVariable, \
-    DiscreteVariable
-from flex_optimization.method_logger import logger
+from flex_optimization.core.recorder import Recorder
+from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
+from flex_optimization.core.problem import Problem
+from flex_optimization.core.method_subclass import ActiveMethod, StopCriteria
 
 
 def dragonfly_setup(options, config):
@@ -39,11 +40,13 @@ def dragonfly_setup(options, config):
 
 class MethodBODragon(ActiveMethod):
     def __init__(self,
-                 problem: Problem,
-                 stop_criteria: Union[StopCriteria, list[StopCriteria], list[list[StopCriteria]]],
-                 multiprocess: Union[bool, int] = False,
-                 init_expts: int = 5,
-                 options: dict = None):
+                problem: Problem,
+                stop_criteria: StopCriteria | list[StopCriteria] | list[list[StopCriteria]],
+                init_expts: int = 5,
+                options: dict = None,
+                 multiprocess: bool | int = False,
+                 recorder: Recorder = None):
+
         default_options = dict(
             build_new_model_every=1,
             init_capital=init_expts,
@@ -54,7 +57,7 @@ class MethodBODragon(ActiveMethod):
             default_options = default_options | options  # overwrite defaults
         self.options = default_options
 
-        super().__init__(problem, stop_criteria, multiprocess)
+        super().__init__(problem, stop_criteria, multiprocess, recorder)
 
         self.optimizer = dragonfly_setup(self.options, self._get_config())
         self._init_points = self.optimizer.ask(init_expts)

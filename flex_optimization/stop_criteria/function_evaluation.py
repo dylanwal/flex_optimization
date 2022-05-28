@@ -1,6 +1,6 @@
 
-from flex_optimization.problem_statement import StopCriteria, Method
-from flex_optimization.method_logger import logger
+from flex_optimization.core.method import Method
+from flex_optimization.core.stop_criteria import StopCriteria
 
 
 class StopFunctionEvaluation(StopCriteria):
@@ -15,5 +15,4 @@ class StopFunctionEvaluation(StopCriteria):
         self.current_eval = method.data.shape[0]
         if self.current_eval >= self.num_eval:
             return False
-        logger.debug(f"{type(self).__name__}| current eval: {self.current_eval}/{self.num_eval}")
         return True

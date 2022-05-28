@@ -1,7 +1,9 @@
 import numpy as np
 from scipy import stats
 
-from flex_optimization.problem_statement import StopCriteria, Method
+from flex_optimization import OptimizationType
+from flex_optimization.core.method import Method
+from flex_optimization.core.stop_criteria import StopCriteria
 
 
 def _linear_regression(x: np.ndarray, y: np.ndarray):
@@ -24,7 +26,7 @@ class StopRate(StopCriteria):
         if len(method.data) < self.prior_steps:  # first iterations
             return True
 
-        if method.problem.optimization_type:  # max
+        if method.problem.type_ == OptimizationType.MAX:
             return self._evaluate_max(method)
 
         return self._evaluate_min(method)

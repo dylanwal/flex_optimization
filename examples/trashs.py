@@ -1,22 +1,22 @@
+import time
 
 import numpy as np
 import plotly.graph_objs as go
 import plotly.express as px
 import pandas as pd
 
-class te:
-    def __init__(self):
-        self.flag =False
 
-    def fun(self):
-        a = [0,1,2,3,4,5]
-        for i in a:
-            yield i
-        self.flag = True
+def fun(a=1):
 
-T = te()
+    for i in range(20000):
+        a = a + a
 
-for i in te.fun(te):
-    print(i)
 
-print(T.flag)
+if __name__ == "__main__":
+    try:
+        for i in range(100):
+            fun(1)
+            time.sleep(0.3)
+    except KeyboardInterrupt as e:
+        exit(e)
+        print("keysssss")

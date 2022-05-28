@@ -1,6 +1,6 @@
 import time
 
-from flex_optimization.problem_statement import StopCriteria
+from flex_optimization.core.stop_criteria import StopCriteria
 
 
 class StopComputationTime(StopCriteria):

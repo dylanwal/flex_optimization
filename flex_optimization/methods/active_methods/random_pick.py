@@ -1,19 +1,22 @@
 import random
-from typing import Union
 
 import numpy as np
 
-from flex_optimization.problem_statement import ActiveMethod, Problem, StopCriteria, ContinuousVariable, DiscreteVariable
+from flex_optimization.core.recorder import Recorder
+from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
+from flex_optimization.core.problem import Problem
+from flex_optimization.core.method_subclass import ActiveMethod, StopCriteria
 
 
 class MethodRandom(ActiveMethod):
 
     def __init__(self,
-             problem: Problem,
-             stop_criteria: Union[StopCriteria, list[StopCriteria], list[list[StopCriteria]]],
-             multiprocess: Union[bool, int] = False):
+                 problem: Problem,
+                 stop_criteria: StopCriteria | list[StopCriteria] | list[list[StopCriteria]],
+                 multiprocess: bool | int = False,
+                 recorder: Recorder = None):
 
-        super().__init__(problem, stop_criteria, multiprocess)
+        super().__init__(problem, stop_criteria, multiprocess, recorder)
 
     @staticmethod
     def _select_point(var):

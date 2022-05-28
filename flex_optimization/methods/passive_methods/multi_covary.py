@@ -1,20 +1,23 @@
 import itertools
-from typing import Union
 
 import numpy as np
 
-from flex_optimization.problem_statement import PassiveMethod, Problem, ContinuousVariable, DiscreteVariable
+from flex_optimization.core.recorder import Recorder
+from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
+from flex_optimization.core.problem import Problem
+from flex_optimization.core.method_subclass import PassiveMethod
 
 
 class MethodMultiCovary(PassiveMethod):
     def __init__(self,
-                 levels: Union[int, list[int], tuple[int]],
                  problem: Problem,
-                 multiprocess: Union[bool, int] = False):
+                 levels: int | list[int] | tuple[int],
+                 multiprocess: bool | int = False,
+                 recorder: Recorder = None):
 
         self._check_levels(levels)
         self.levels = levels
-        super().__init__(problem, multiprocess)
+        super().__init__(problem, multiprocess, recorder)
 
     @staticmethod
     def _check_levels(levels):

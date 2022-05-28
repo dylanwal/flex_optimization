@@ -1,5 +1,6 @@
-
-from flex_optimization.problem_statement import StopCriteria, Method
+from flex_optimization import OptimizationType
+from flex_optimization.core.method import Method
+from flex_optimization.core.stop_criteria import StopCriteria
 
 
 class StopRelativeRate(StopCriteria):
@@ -18,7 +19,7 @@ class StopRelativeRate(StopCriteria):
         if len(method.data) < self.prior_steps:  # first iterations
             return True
 
-        if method.problem.optimization_type:  # max
+        if method.problem.type_ == OptimizationType.MAX:  # max
             return self._evaluate_max(method)
 
         return self._evaluate_min(method)

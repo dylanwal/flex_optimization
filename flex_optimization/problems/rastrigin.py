@@ -1,7 +1,9 @@
 
 import numpy as np
 
-from flex_optimization.problems.utils import get_dimensionality
+from flex_optimization import OptimizationType
+from flex_optimization.problems import ProblemClassification
+from flex_optimization.problems.utils import to_numpy_array
 
 
 def rastrigin(args, constant: float = 10) -> np.ndarray:
@@ -19,7 +21,7 @@ def rastrigin(args, constant: float = 10) -> np.ndarray:
     Parameters
     ----------
     args: array
-        [x[:], y[:], z[:], ...]
+        [x[:], y[:], z[:], ...] or np.ndarray[:,:] (second index determines dimensionality)
         the number of values determines dimensionality
     constant: float
 
@@ -29,20 +31,33 @@ def rastrigin(args, constant: float = 10) -> np.ndarray:
         z value
 
     """
-    if not isinstance(args, (list, tuple, np.ndarray)):
-        raise ValueError("Invalid args.")
+    args = to_numpy_array(args)
+    d = args.shape[1]
+    n = args.shape[0]
 
-    d = get_dimensionality(args)
-
-    sum_ = 0
-    if isinstance(args, np.ndarray) and args.shape[1] >= 2:
-        for i in range(args.shape[1]):
-            sum_ += args[:, i]**2 - constant * np.cos(2 * np.pi * args[:, i])
-    if isinstance(args, list):
-        for x in args:
-            sum_ += x**2 - constant * np.cos(2 * np.pi * x)
+    sum_ = np.zeros(n)
+    for i in range(args.shape[1]):
+        sum_ += args[:, i]**2 - constant * np.cos(2 * np.pi * args[:, i])
 
     return constant*d + sum_
+
+
+def goal(d: int):
+    return np.zeros(d)
+
+
+classification_class = ProblemClassification(
+    name="rastrigin",
+    func=rastrigin,
+    type_=OptimizationType.MIN,
+    global_goal=goal,
+    range_=(-5.12, 5.12),
+    local_min=100,
+    num_dim=(1, float('inf')),
+    convex=False,
+    roughness=7,
+    symmetric=True
+)
 
 
 def local_run():
@@ -57,6 +72,8 @@ def local_run():
 
     import plotly.graph_objs as go
     fig = go.Figure(go.Surface(x=x, y=y, z=zz.T.reshape(n, n)))
+    fig.add_trace(go.Scatter3d(x=[0], y=[0], z=[0], mode="markers", marker=dict(color="white", size=5)))
+    # fig.write_image("imgs//rastrigin.svg")
     fig.show()
 
 
@@ -73,11 +90,13 @@ def local_run2():
     aa = rastrigin([xx, yy, zz])
 
     import plotly.express as px
+    import plotly.graph_objs as go
     import pandas as pd
     df = pd.DataFrame(np.stack((xx, yy, zz, aa), axis=1))
     fig = px.scatter_3d(df, x=0, y=1, z=2, color=3)
+    fig.add_trace(go.Scatter3d(x=[0], y=[0], z=[0], mode="markers", marker=dict(color="white", size=5)))
     fig.show()
 
 
 if __name__ == "__main__":
-    local_run2()
+    local_run()

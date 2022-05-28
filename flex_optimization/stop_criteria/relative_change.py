@@ -1,5 +1,6 @@
-
-from flex_optimization.problem_statement import StopCriteria, Method
+from flex_optimization import OptimizationType
+from flex_optimization.core.method import Method
+from flex_optimization.core.stop_criteria import StopCriteria
 
 
 class StopRelativeChange(StopCriteria):
@@ -17,7 +18,7 @@ class StopRelativeChange(StopCriteria):
             self.prior_value = method.data.iloc[-1]["metric"]
             return True
 
-        if method.problem.optimization_type:  # max
+        if method.problem.type_ == OptimizationType.MAX:  # max
             return self._evaluate_max(method)
 
         return self._evaluate_min(method)

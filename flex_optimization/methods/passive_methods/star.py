@@ -1,8 +1,10 @@
-from typing import Union
 
 import numpy as np
 
-from flex_optimization.problem_statement import PassiveMethod, Problem, ContinuousVariable, DiscreteVariable
+from flex_optimization.core.recorder import Recorder
+from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
+from flex_optimization.core.problem import Problem
+from flex_optimization.core.method_subclass import PassiveMethod
 
 
 def star(d: int, center: bool = True) -> np.ndarray:
@@ -52,7 +54,7 @@ def star_levels(d: int, center: bool = True, levels: int = 2) -> np.ndarray:
 
     return points
 
-
+# TODO: add rotation option
 # def rotate(vector1: np.ndarray,  angle: float = np.pi / 4):
 #     """https://core.ac.uk/download/pdf/295553405.pdf
 #     https://stackoverflow.com/questions/50337642/how-to-calculate-a-rotation-matrix-in-n-dimensions-given-the-point-to-rotate-an"""
@@ -87,13 +89,14 @@ def map_number(old_value, old_min, old_max, new_min, new_max) -> float:
 
 class MethodStar(PassiveMethod):
     def __init__(self,
-                 levels: int,
                  problem: Problem,
-                 multiprocess: Union[bool, int] = False):
+                 levels: int | list[int] | tuple[int],
+                 multiprocess: bool | int = False,
+                 recorder: Recorder = None):
 
         self._check_levels(levels)
         self.levels = levels
-        super().__init__(problem, multiprocess)
+        super().__init__(problem, multiprocess, recorder)
 
     @staticmethod
     def _check_levels(levels):
