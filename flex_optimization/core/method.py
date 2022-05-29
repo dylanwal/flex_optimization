@@ -37,5 +37,4 @@ class Method(ABC):
             from flex_optimization.recorders.full import RecorderFull
             recorder = RecorderFull(self.problem, self)
 
-        self.problem.recorder = recorder
         return recorder

@@ -1,7 +1,31 @@
+import enum
+
+
+class MethodType(enum.Enum):
+    PASSIVE_SAMPLING = 0
+    ACTIVE_SAMPLING = 1
+    ACTIVE_GRADIENT = 2
+    ACTIVE_BAYESIAN = 3
+
+
+class MethodClassification:
+    population = []
+
+    def __init__(self, name: str, func: callable, type_: MethodType):
+        self.name = name
+        self.func = func
+        self.type_ = type_
+
+        MethodClassification.population.append(self)
+
+    def __repr__(self):
+        return f"{self.name} | {self.type_}"
+
+
 # passive sampling
 from flex_optimization.methods.passive_methods.factorial import MethodFactorial
-from flex_optimization.methods.passive_methods.covary import MethodCovary
-from flex_optimization.methods.passive_methods.multi_covary import MethodMultiCovary
+from flex_optimization.methods.passive_methods.covariance import MethodCovariance
+from flex_optimization.methods.passive_methods.multi_covariance import MethodMultiCovariance
 from flex_optimization.methods.passive_methods.star import MethodStar
 
 # active sampling

@@ -7,6 +7,7 @@ from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import ActiveMethod, StopCriteria
+from flex_optimization.methods import MethodType, MethodClassification
 
 
 def map_number(old_value, old_min, old_max, new_min, new_max) -> float:
@@ -14,14 +15,26 @@ def map_number(old_value, old_min, old_max, new_min, new_max) -> float:
 
 
 class MethodLatinHypercube(ActiveMethod):
+    """
+    Method: Latin Hypercube
 
+    The latin hypercube  picks points by dividing the sample space into equally size intervals, and selecting points
+    from the intervals.
+
+    Parameters
+    ----------
+    seed: int
+        seed
+
+    """
     def __init__(self,
                  problem: Problem,
                  stop_criteria: StopCriteria | list[StopCriteria] | list[list[StopCriteria]],
+                 seed: int = None,
                  multiprocess: bool | int = False,
                  recorder: Recorder = None):
 
-        self.hypercube = LatinHypercube(d=len(problem.variables))
+        self.hypercube = LatinHypercube(d=len(problem.variables), seed=seed)
         super().__init__(problem, stop_criteria, multiprocess, recorder)
 
     def get_point(self) -> list:
@@ -36,3 +49,10 @@ class MethodLatinHypercube(ActiveMethod):
                 raise NotImplementedError
 
         return out
+
+
+method_class = MethodClassification(
+    name="Latin hypercube",
+    func=MethodLatinHypercube,
+    type_=MethodType.ACTIVE_SAMPLING
+)

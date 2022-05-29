@@ -2,7 +2,7 @@ from flex_optimization import OptimizationType
 from flex_optimization.core.method import Method
 from flex_optimization.core.stop_criteria import StopCriteria
 
-
+# TODO: update this and add to options
 class StopRelativeRate(StopCriteria):
     def __init__(self, cut_off_rate: float = 0.01, prior_steps: int = 3, cut_off_steps: int = 3):
         raise NotImplementedError("coming soon")

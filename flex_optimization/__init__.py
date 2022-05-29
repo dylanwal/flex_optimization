@@ -13,6 +13,10 @@ class OptimizationType(enum.Enum):
     MAXIMUM = 1
 
 
+class NotSupported(Exception):
+    pass
+
+
 from flex_optimization.core.variable import DiscreteVariable, ContinuousVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.logger_ import logger

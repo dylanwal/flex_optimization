@@ -14,6 +14,7 @@ class Recorder(ABC):
     FINISH = 4
     NOTES = 5
     WARNING = 6
+    ERROR = 7
 
     def __init__(self, problem=None, method=None):
         self.problem = problem
@@ -23,6 +24,7 @@ class Recorder(ABC):
         self._best_result = None
         self._up_to_date = False
         self._error = None
+        self._multiprocessing = False
 
     def _error_exit(self, e):
         """ Here to do something if error occurs during optimization. """
@@ -41,7 +43,10 @@ class Recorder(ABC):
         if self._df is None:
             if len(self.data) == 0:
                 raise Exception("Error occurred. No data to generate data frame.")
-            columns = self.problem.variable_names
+            columns = []
+            if self._multiprocessing:
+                columns += ["batch"]
+            columns += self.problem.variable_names
             columns += [f"inter_{i}" for i in range(len(self.data[0]) - self.problem.num_variables - 1)]
             columns += ["metric"]
             self._df = pd.DataFrame(self.data, columns=columns)
@@ -70,8 +75,18 @@ class Recorder(ABC):
         obj = copy.copy(self)
         del obj.data
         del obj._df
-        with open(f"{file_name}.pickle", "wb") as file:
-            pickle.dump(obj, file)
+        delete_list = [[obj.method, "optimizer"], [obj.problem, "func"], [obj, "method"], [obj.problem, "metric"]]
+
+        for att in delete_list:
+            try:
+                with open(f"{file_name}.pickle", "wb") as file:
+                    pickle.dump(obj, file)
+            except:
+                if hasattr(att[0], att[1]):
+                    print(f"item {att[0]}.{att[1]} was dropped in attempt to save data.")
+                    delattr(att[0], att[1])
+                continue
+            break
 
     @classmethod
     def load(cls, file_name: str):

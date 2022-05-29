@@ -7,6 +7,7 @@ from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import ActiveMethod, StopCriteria
+from flex_optimization.methods import MethodType, MethodClassification
 
 
 def map_number(old_value, old_min, old_max, new_min, new_max) -> float:
@@ -48,3 +49,10 @@ class MethodMultiNormal(ActiveMethod):
             out.append(self._re_map(v, var[i]))
 
         return out
+
+
+method_class = MethodClassification(
+    name="multi-normal",
+    func=MethodMultiNormal,
+    type_=MethodType.ACTIVE_SAMPLING
+)

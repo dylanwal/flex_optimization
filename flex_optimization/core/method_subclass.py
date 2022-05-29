@@ -46,14 +46,14 @@ class PassiveMethod(Method, ABC):
         for point in points:
             result = self.problem.evaluate(point)
             metric = self.problem.metric(result)
-            self.recorder.record(self.recorder.EVALUATION, point=point, result=result, metric=metric)
+            self.recorder.record(self.recorder.EVALUATION, point=[point], result=result, metric=metric)
 
     def _run_multiproessing(self, points):
 
         def callback(results):
             point_, result = results
             metric = self.problem.metric(result)
-            self.recorder.record(self.recorder.EVALUATION, point=point_, result=result, metric=metric)
+            self.recorder.record(self.recorder.EVALUATION, point=[point_], result=result, metric=metric)
 
         from functools import partial
         from flex_optimization.core.utils import PoolHandler
@@ -82,7 +82,7 @@ class ActiveMethod(Method, ABC):
         super().__init__(problem, multiprocess, recorder)
 
     def method_init(self):
-        pass
+        self._flag_init = True
 
     @abstractmethod
     def get_point(self):
@@ -109,6 +109,9 @@ class ActiveMethod(Method, ABC):
         -------
 
         """
+        if not self._flag_init:
+            self.method_init()
+
         try:
             if self.multiprocess:
                 self._multi_run_step(algo_steps)
@@ -120,7 +123,7 @@ class ActiveMethod(Method, ABC):
                 point = self.get_point()
                 result = self.problem.evaluate(point)
                 metric = self.problem.metric(result)
-                self._tell(point, result, metric)
+                self._tell([point], result, metric)
                 if not self._check_stop_criterion():
                     break
 

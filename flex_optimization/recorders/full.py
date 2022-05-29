@@ -3,9 +3,31 @@ from datetime import datetime
 
 import numpy as np
 
-from flex_optimization import OptimizationType
 from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.logger_ import logger
+
+
+def _obj_to_list(obj):
+    obj_ = []
+    if isinstance(obj, (list, tuple)):
+        for row in obj:
+            if isinstance(row, list):
+                obj_.append(row)
+            elif isinstance(row, tuple):
+                obj_.append(list(row))
+            elif isinstance(row, np.ndarray):
+                obj_.append(row.tolist())
+            elif isinstance(row, (int, float, str)):
+                obj_.append([row])
+    elif isinstance(obj, np.ndarray):
+        for i in obj:
+            obj_.append([i.tolist()])
+
+    return obj_
+
+
+def shape_check(point, result, metric) -> (list[list], list[list], list[list]):
+    return _obj_to_list(point), _obj_to_list(result), _obj_to_list(metric)
 
 
 class RecorderFull(Recorder):
@@ -24,7 +46,6 @@ class RecorderFull(Recorder):
     def _error_exit(self, e):
         """ Save data if something goes wrong in the middle of the optimization. """
         from datetime import datetime
-        from flex_optimization.core.utils import custom_formatwarning
 
         self._error = e
         if len(self.data) > 1:
@@ -49,6 +70,12 @@ class RecorderFull(Recorder):
             self._record_finish()
         elif type_ == self.NOTES:
             self._record_notes(**kwargs)
+        elif type_ == self.WARNING:
+            self._record_warning(**kwargs)
+        elif type_ == self.ERROR:
+            self._record_error(**kwargs)
+        else:
+            raise NotImplementedError("The full recorder should implement everything!")
 
     def _record_setup(self):
         # log problem
@@ -66,21 +93,46 @@ class RecorderFull(Recorder):
         logger.info(f"\nOptimization Running | start:{self.start_time}")
 
     def _record_evaluation(self, point, result, metric):
+        show_metric = True
+        show_iteration = False
+        if result == metric:
+            show_metric = False
+        if hasattr(self.method, "iteration_count"):
+            show_iteration = True
+
         if self._first_eval:
             self._first_eval = False
-            if result == metric:
-                logger.monitor(f"{[self.problem.variable_names]} --> result\n")
-            else:
-                logger.monitor(f"{[self.problem.variable_names]} --> result --> metric")
+            self._create_header(show_metric, show_iteration)
 
-        if result == metric:
-            self.data.append(np.hstack((point, result)))
-            logger.monitor(f"{self.num_data_points} | {point} --> {result}")
-        else:
-            self.data.append(np.hstack((point, result, metric)))
-            logger.monitor(f"{self.num_data_points} | {point} --> {result} --> {metric}")
-        self.num_data_points += 1
+        point, result, metric = shape_check(point, result, metric)
+        for p, r, m in zip(point, result, metric):
+            # save data
+            if show_metric:
+                self.data.append(p + r)
+            else:
+                self.data.append(p + r + m)
+
+            # send data to logger
+            mes = f"{self.num_data_points} |"
+            if show_iteration:
+                mes += f" {self.method.iteration_count} |"
+            mes += f" {p} --> {r}"
+            if show_metric:
+                mes += f" --> {m}"
+            logger.monitor(mes)
+            self.num_data_points += 1
+
         self._up_to_date = False
+
+    def _create_header(self, show_metric: bool = False, show_iteration: bool = False):
+        mes = "counter |"
+        if show_iteration:
+            mes += " iteration | "
+        mes += f"{[self.problem.variable_names]} --> result"
+        if show_metric:
+            mes += " --> metric"
+        logger.monitor(mes)
+        logger.monitor("-" * len(mes))
 
     @staticmethod
     def _record_stop(text: str):
@@ -97,5 +149,10 @@ class RecorderFull(Recorder):
     def _record_notes(text: str):
         logger.info(text)
 
+    @staticmethod
+    def _record_warning(text: str):
+        logger.warn(text)
 
-
+    @staticmethod
+    def _record_error(text: str):
+        logger.error(text)

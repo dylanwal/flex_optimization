@@ -5,9 +5,22 @@ from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import PassiveMethod
+from flex_optimization.methods import MethodType, MethodClassification
 
 
 class MethodFactorial(PassiveMethod):
+    """
+    Method: Factorial
+
+    Creates a full factorial design.
+    Every possible combination of factors
+
+    Parameters
+    ----------
+    levels: int
+        number of levels for each variable
+
+    """
     def __init__(self,
                  problem: Problem,
                  levels: int | list[int] | tuple[int],
@@ -58,3 +71,8 @@ class MethodFactorial(PassiveMethod):
         return list(itertools.product(*args))
 
 
+method_class = MethodClassification(
+    name="factorial",
+    func=MethodFactorial,
+    type_=MethodType.PASSIVE_SAMPLING
+)

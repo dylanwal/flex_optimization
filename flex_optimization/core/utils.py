@@ -55,7 +55,7 @@ class PoolHandler:
 
     @staticmethod
     def _process_error_check(result):
-        if res := result.successful():
+        if result.successful():
             return  # process exited normally
         result.get()
         raise multiprocessing.ProcessError(f"Process exited unexpectedly with error code.")

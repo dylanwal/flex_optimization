@@ -6,6 +6,7 @@ from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import ActiveMethod, StopCriteria
+from flex_optimization.methods import MethodType, MethodClassification
 
 
 def map_number(old_value, old_min, old_max, new_min, new_max) -> float:
@@ -35,3 +36,10 @@ class MethodHalton(ActiveMethod):
                 raise NotImplementedError
 
         return out
+
+
+method_class = MethodClassification(
+    name="Halton",
+    func=MethodHalton,
+    type_=MethodType.ACTIVE_SAMPLING
+)

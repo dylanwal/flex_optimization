@@ -6,6 +6,7 @@ from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import ActiveMethod, StopCriteria
+from flex_optimization.methods import MethodClassification, MethodType
 
 
 class MethodRandom(ActiveMethod):
@@ -33,3 +34,10 @@ class MethodRandom(ActiveMethod):
     def get_points(self, num: int) -> list[list]:
         """ Get multiple points. """
         return [[self._select_point(var) for var in self.problem.variables] for _ in range(num)]
+
+
+method_class = MethodClassification(
+    name="random",
+    func=MethodRandom,
+    type_=MethodType.ACTIVE_SAMPLING
+)

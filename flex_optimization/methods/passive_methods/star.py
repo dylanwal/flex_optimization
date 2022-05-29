@@ -5,6 +5,7 @@ from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import PassiveMethod
+from flex_optimization.methods import MethodClassification, MethodType
 
 
 def star(d: int, center: bool = True) -> np.ndarray:
@@ -88,6 +89,12 @@ def map_number(old_value, old_min, old_max, new_min, new_max) -> float:
 
 
 class MethodStar(PassiveMethod):
+    """
+    Method: Star
+
+    The Star algorithm chooses points on a star like pattern.
+
+    """
     def __init__(self,
                  problem: Problem,
                  levels: int | list[int] | tuple[int],
@@ -125,3 +132,10 @@ class MethodStar(PassiveMethod):
     def get_points(self) -> list[tuple]:
         star_points = star_levels(d=self.problem.num_variables_continuous, levels=self.levels)
         return self._re_map(star_points)
+
+
+method_class = MethodClassification(
+    name="star",
+    func=MethodStar,
+    type_=MethodType.PASSIVE_SAMPLING
+)

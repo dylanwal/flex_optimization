@@ -34,6 +34,7 @@ class Problem(ABC):
         self.kwargs = kwargs
         self.variables = variables
         self.type_ = type_
+        self._temp_data = []
 
     def __repr__(self):
         return f"Find the {self.type_.name} of '{self.func.__name__}' with {self.num_variables} variables"
@@ -58,10 +59,31 @@ class Problem(ABC):
         return self._func(*args, **kwargs)
 
     def evaluate(self, *args, **kwargs):
-        return self._func(*args, **kwargs, **self.kwargs)
+        kwargs_ = self.kwargs | kwargs
+        return self.func(*args, **kwargs_)
 
-    def metric(self, results):
+    def evaluate_multi(self, points: list | list[list], **kwargs) -> list:
+        result = []
+        for point in points:
+            result = self.func(point, **kwargs, **self.kwargs)
+        return result
+
+    def evaluate_capture(self, *args, **kwargs):
+        # TODO: added because scipy doesn't allow intermittent values, fix scipy callback
+        result = self._func(*args, **kwargs, **self.kwargs)
+        metric = self.metric(result)
+        self._temp_data.append([*args, result, metric])
+        return metric
+
+    def evaluate_multiprocessing(self, points, processes: int):
+        """ For mini-batches only. """
+        import multiprocessing
+        with multiprocessing.Pool(processes) as p:
+            result = p.map(self.evaluate, points)
+        return result
+
+    def metric(self, result):
         if self._metric is not None:
-            return self._metric(results)
+            return self._metric(result)
 
-        return results
+        return result

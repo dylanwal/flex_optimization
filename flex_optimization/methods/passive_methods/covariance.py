@@ -1,4 +1,3 @@
-import itertools
 
 import numpy as np
 
@@ -6,9 +5,17 @@ from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import PassiveMethod
+from flex_optimization.methods import MethodClassification, MethodType
 
 
-class MethodMultiCovary(PassiveMethod):
+class MethodCovariance(PassiveMethod):
+    """
+    Method: Covariance
+
+    Method picks points by varying one or more factors linearly across the domain.
+
+
+    """
     def __init__(self,
                  problem: Problem,
                  levels: int | list[int] | tuple[int],
@@ -44,7 +51,7 @@ class MethodMultiCovary(PassiveMethod):
     @staticmethod
     def _set_level(var, num_levels: int):
         if isinstance(var, ContinuousVariable):
-            levels = np.linspace(var.min_, var.max_, num_levels).tolist()
+            levels = np.linspace(var.min_, var.max_, num_levels)
             setattr(var, "levels", levels)
         elif isinstance(var, DiscreteVariable):
             setattr(var, "levels", var.items)
@@ -55,20 +62,12 @@ class MethodMultiCovary(PassiveMethod):
         self._set_levels()
         args = [var.levels for var in self.problem.variables]
 
-        out = []
-        for i in range(len(self.problem.variables)):
-            args2 = self.flip_arg(args, i)
-            out += list(map(list, itertools.zip_longest(*args2, fillvalue=None)))
+        import itertools
+        return list(map(list, itertools.zip_longest(*args, fillvalue=None)))
 
-        return out
 
-    @staticmethod
-    def flip_arg(list_: list[list], cut_off: int = 0) -> list[list]:
-        out = []
-        for i in range(len(list_)):
-            sub_list = list_[i]
-            if i < cut_off:
-                sub_list.reverse()
-            out.append(sub_list)
-
-        return out
+method_class = MethodClassification(
+    name="covariance",
+    func=MethodCovariance,
+    type_=MethodType.PASSIVE_SAMPLING
+)
