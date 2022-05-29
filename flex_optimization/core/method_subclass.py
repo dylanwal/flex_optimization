@@ -76,7 +76,6 @@ class ActiveMethod(Method, ABC):
         if not isinstance(stop_criterion, list):
             stop_criterion = [stop_criterion]
         self.stop_criterion: list[StopCriteria] = stop_criterion
-        self.stop_criteria = None
         self.iteration_count = 0
         self._flag_init = False  # False = Not initialized
         super().__init__(problem, multiprocess, recorder)

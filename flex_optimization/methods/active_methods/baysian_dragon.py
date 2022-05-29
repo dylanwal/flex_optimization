@@ -1,6 +1,7 @@
 
 from argparse import Namespace
 
+from flex_optimization import OptimizationType
 from flex_optimization.methods import MethodType, MethodClassification
 from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.variable import ContinuousVariable, DiscreteVariable
@@ -104,6 +105,11 @@ class MethodBODragon(ActiveMethod):
 
     def _tell(self, point, result, metric):
         super()._tell(point, result, metric)
+
+        # DragonFly is a maximizer, so this enables minimization
+        if self.problem.type_ == OptimizationType.MIN:
+            metric = -1*metric
+
         if len(point) > 1:
             for p, r in zip(point, metric):
                 self.optimizer.step_idx += 1  # increment experiment number

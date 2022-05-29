@@ -6,6 +6,9 @@ class MethodType(enum.Enum):
     ACTIVE_SAMPLING = 1
     ACTIVE_GRADIENT = 2
     ACTIVE_BAYESIAN = 3
+    ACTIVE_SIMPLEX = 4
+    ACTIVE_LINESEARCH = 5
+    ACTIVE_TRUST = 6
 
 
 class MethodClassification:
@@ -36,7 +39,16 @@ from flex_optimization.methods.active_methods.halton import MethodHalton
 from flex_optimization.methods.active_methods.multivariate_normal import MethodMultiNormal
 
 # gradient based
-from flex_optimization.methods.active_methods.BFGS import MethodBFGS
+from flex_optimization.methods.active_methods.scipy.BFGS import MethodBFGS
+
+# simplex based
+from flex_optimization.methods.active_methods.scipy.nelder_mead import MethodNelderMead
+
+# line search based
+from flex_optimization.methods.active_methods.scipy.powell import MethodPowell
+
+# trust
+from flex_optimization.methods.active_methods.scipy.trust_constraint import MethodTrustConstraint
 
 # active learning
 from flex_optimization.methods.active_methods.baysian_dragon import MethodBODragon

@@ -14,7 +14,18 @@ This directory contains collection of methods for optimization.
 |name | factorial| 
 |func | <class 'flex_optimization.methods.passive_methods.factorial.MethodFactorial'>| 
 |type_ | MethodType.PASSIVE_SAMPLING| 
-None
+
+    Method: Factorial
+
+    Creates a full factorial design.
+    Every possible combination of factors
+
+    Parameters
+    ----------
+    levels: int
+        number of levels for each variable
+
+    
 
 
 ----
@@ -26,7 +37,13 @@ None
 |name | covariance| 
 |func | <class 'flex_optimization.methods.passive_methods.covariance.MethodCovariance'>| 
 |type_ | MethodType.PASSIVE_SAMPLING| 
-None
+
+    Method: Covariance
+
+    Method picks points by varying one or more factors linearly across the domain.
+
+
+    
 
 
 ----
@@ -50,7 +67,12 @@ None
 |name | star| 
 |func | <class 'flex_optimization.methods.passive_methods.star.MethodStar'>| 
 |type_ | MethodType.PASSIVE_SAMPLING| 
-None
+
+    Method: Star
+
+    The Star algorithm chooses points on a star like pattern.
+
+    
 
 
 ----
@@ -86,7 +108,18 @@ None
 |name | Latin hypercube| 
 |func | <class 'flex_optimization.methods.active_methods.latin_hypercube.MethodLatinHypercube'>| 
 |type_ | MethodType.ACTIVE_SAMPLING| 
-None
+
+    Method: Latin Hypercube
+
+    The latin hypercube  picks points by dividing the sample space into equally size intervals, and selecting points
+    from the intervals.
+
+    Parameters
+    ----------
+    seed: int
+        seed
+
+    
 
 
 ----
@@ -120,9 +153,82 @@ None
 |key | value|
 |---|---|
 |name | Broyden–Fletcher–Goldfarb–Shanno (BFGS)| 
-|func | <class 'flex_optimization.methods.active_methods.BFGS.MethodBFGS'>| 
+|func | <class 'flex_optimization.methods.active_methods.scipy.BFGS.MethodBFGS'>| 
 |type_ | MethodType.ACTIVE_GRADIENT| 
-None
+
+    Method: Broyden–Fletcher–Goldfarb–Shanno algorithm (BFGS)
+
+    * unconstrained
+    * nonlinear
+
+    steps:
+    1) determines the descent direction by precondition the gradient with curvature information
+
+
+    
+
+
+----
+
+# Nelder–Mead
+
+|key | value|
+|---|---|
+|name | Nelder–Mead| 
+|func | <class 'flex_optimization.methods.active_methods.scipy.nelder_mead.MethodNelderMead'>| 
+|type_ | MethodType.ACTIVE_SIMPLEX| 
+
+    Method: Nelder Mead algorithm
+    * also known as downhill simplex method, amoeba method
+
+    * unconstrained
+    * nonlinear
+
+    steps:
+    1) determines the descent direction by precondition the gradient with curvature information
+
+
+    
+
+
+----
+
+# Powell
+
+|key | value|
+|---|---|
+|name | Powell| 
+|func | <class 'flex_optimization.methods.active_methods.scipy.powell.MethodPowell'>| 
+|type_ | MethodType.ACTIVE_LINESEARCH| 
+
+    Method: Powell algorithm
+
+
+    steps:
+    The method minimises the function by a bi-directional search along each search vector, in turn.
+
+
+    
+
+
+----
+
+# Trust Constraint
+
+|key | value|
+|---|---|
+|name | Trust Constraint| 
+|func | <class 'flex_optimization.methods.active_methods.scipy.trust_constraint.MethodTrustConstraint'>| 
+|type_ | MethodType.ACTIVE_TRUST| 
+
+    Method: Trust Constraint
+
+    https://docs.scipy.org/doc/scipy/reference/optimize.minimize-trustconstr.html#optimize-minimize-trustconstr
+
+    steps:
+
+
+    
 
 
 ----
@@ -134,7 +240,7 @@ None
 |name | random| 
 |func | <class 'flex_optimization.methods.active_methods.baysian_dragon.MethodBODragon'>| 
 |type_ | MethodType.ACTIVE_BAYESIAN| 
-None
+ Setup for single objective only
 
 
 ----
