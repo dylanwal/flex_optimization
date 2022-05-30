@@ -103,9 +103,9 @@ class RecorderFull(Recorder):
 
     def _record_finish(self):
         self.end_time = datetime.now()
-        logger.info(f"Calculation time: {self.duration}")
-        time.sleep(0.1)
+        time.sleep(0.1)  # to ensure all evaluations print first
 
+        logger.info(f"Calculation time: {self.duration}")
         logger.info(f"\nBest Result: {self.best_result}")
 
     @staticmethod

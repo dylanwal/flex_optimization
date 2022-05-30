@@ -24,7 +24,7 @@ def main():
         time.sleep(0.5)
         print(f"step{i} done")
 
-    vis = fo.OptimizationVis(problem, method.data)
+    vis = fo.VizOptimization(problem, method.data)
     fig = vis.plot_3d_vis()
     fig.show()
 

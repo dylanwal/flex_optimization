@@ -71,7 +71,7 @@ def main():
 
     method.run()
 
-    vis = fo.OptimizationVis(method.recorder, true_func=true_func)
+    vis = fo.VizOptimization(method.recorder, true_func=true_func)
     fig = vis.plot_3d_vis()
     fig.show()
 

@@ -39,14 +39,14 @@ def main():
 
     # multiprocessing
     # method = fo.methods.MethodFactorial(problem=problem, levels=10, multiprocess=True)
-    method = fo.methods.MethodSobol(problem, fo.stop_criteria.StopFunctionEvaluation(100), multiprocess=True)
+    # method = fo.methods.MethodSobol(problem, fo.stop_criteria.StopFunctionEvaluation(100), multiprocess=True)
     # method = fo.methods.MethodBODragon(problem, stop_criteria=fo.stop_criteria.StopFunctionEvaluation(12), multiprocess=True,
     #                              options=dict(build_new_model_every=3))
 
 
     method.run()
 
-    vis = fo.OptimizationVis(method.recorder, true_func=problem.evaluate)
+    vis = fo.VizOptimization(method.recorder, true_func=problem.evaluate)
     fig = vis.plot_3d_vis()
     fig.show()
 

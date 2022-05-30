@@ -6,7 +6,7 @@ import plotly.express as px
 from flex_optimization.core.recorder import Recorder
 
 
-class OptimizationVis:
+class VizOptimization:
     def __init__(self, recorder: Recorder, true_func: callable = None):
         self.recorder = recorder
         self.df: pd.DataFrame = self.recorder.df

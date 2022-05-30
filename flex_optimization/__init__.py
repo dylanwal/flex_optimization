@@ -20,7 +20,7 @@ class NotSupported(Exception):
 from flex_optimization.core.variable import DiscreteVariable, ContinuousVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.logger_ import logger
-from flex_optimization.core.visualize import OptimizationVis
+from flex_optimization.core.visualize import VizOptimization
 
 import flex_optimization.recorders as recorders
 import flex_optimization.stop_criteria as stop_criteria

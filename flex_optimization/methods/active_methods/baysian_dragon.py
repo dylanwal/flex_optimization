@@ -111,12 +111,12 @@ class MethodBODragon(ActiveMethod):
 
         # DragonFly is a maximizer, so this enables minimization
         if self.problem.type_ == OptimizationType.MIN:
-            metric = -1 * datapoint.metric
+            metric = -1 * datapoint.metric[0]
         else:
-            metric = datapoint.metric
+            metric = datapoint.metric[0]
 
         self.optimizer.step_idx += 1  # increment experiment number in dragonfly
-        self.optimizer.tell([(datapoint.point, metric[0])])  # return result to algorithm
+        self.optimizer.tell([(datapoint.point, metric)])  # return result to algorithm
 
     def _multi_run_step(self, algo_steps: int):
         self._multi_run_step_init()  # Initialization phase

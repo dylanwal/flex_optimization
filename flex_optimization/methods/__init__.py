@@ -32,11 +32,11 @@ from flex_optimization.methods.passive_methods.multi_covariance import MethodMul
 from flex_optimization.methods.passive_methods.star import MethodStar
 
 # active sampling
-from flex_optimization.methods.active_methods.random_pick import MethodRandom
-from flex_optimization.methods.active_methods.sobol import MethodSobol
-from flex_optimization.methods.active_methods.latin_hypercube import MethodLatinHypercube
-from flex_optimization.methods.active_methods.halton import MethodHalton
-from flex_optimization.methods.active_methods.multivariate_normal import MethodMultiNormal
+from flex_optimization.methods.active_methods.sampler.random_pick import MethodRandom
+from flex_optimization.methods.active_methods.sampler.sobol import MethodSobol
+from flex_optimization.methods.active_methods.sampler.halton import MethodHalton
+from flex_optimization.methods.active_methods.sampler.multivariate_normal import MethodMultiNormal
+from flex_optimization.methods.active_methods.sampler.latin_hypercube import MethodLatinHypercube
 
 # gradient based
 from flex_optimization.methods.active_methods.scipy.BFGS import MethodBFGS

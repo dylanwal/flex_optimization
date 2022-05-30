@@ -43,7 +43,8 @@ class Recorder(ABC):
     def df(self) -> pd.DataFrame:
         if self._df is None:
             if len(self.data) == 0:
-                raise Exception("Error occurred. No data to generate data frame.")
+                raise Exception("Error occurred. No data present to generate data frame. "
+                                "Did you forget to 'run' the optimization?")
             columns = self._get_dataframe_column_names()
             data = [dat.data_chunk for dat in self.data]
             self._df = pd.DataFrame(data, columns=columns)
