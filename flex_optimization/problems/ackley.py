@@ -3,10 +3,9 @@ import numpy as np
 
 from flex_optimization import OptimizationType
 from flex_optimization.problems import ProblemClassification
-from flex_optimization.problems.utils import to_numpy_array
 
 
-def ackley(args) -> np.ndarray:
+def ackley(args: list[float]) -> float:
     """
     Ackley function
 
@@ -22,25 +21,22 @@ def ackley(args) -> np.ndarray:
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:,:] (first index determines dimensionality)
-        the number of values determines dimensionality
+    args: list[float]
+        [x, y, z, ...] (length determines dimensionality)
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     """
-    args = to_numpy_array(args)
-    d = args.shape[1]
-    n = args.shape[0]
+    d = len(args)
 
-    first_sum = np.zeros(n)
-    second_sum = np.zeros(n)
-    for i in range(args.shape[1]):
-        first_sum += args[:, i]**2
-        second_sum += np.cos(2 * np.pi * args[:, i])
+    first_sum = 0
+    second_sum = 0
+    for i in range(d):
+        first_sum += args[i]**2
+        second_sum += np.cos(2 * np.pi * args[i])
 
     return -20.0*np.exp(-0.2*np.sqrt(first_sum/d)) - np.exp(second_sum/d) + 20 + np.e
 
@@ -74,7 +70,7 @@ def local_run():
     zz = ackley([xx, yy])
 
     import plotly.graph_objs as go
-    fig = go.Figure(go.Surface(x=x, y=y, z=zz.T.reshape(n, n)))
+    fig = go.Figure(go.Surface(x=x, y=y, z=zz.reshape(n, n).T))
     # fig.write_image("imgs//ackley.svg")
     fig.show()
 

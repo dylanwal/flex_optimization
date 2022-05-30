@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 from flex_optimization import OptimizationType
+from flex_optimization.core.data_point import DataPoint
 
 
 class Recorder(ABC):
@@ -19,7 +20,7 @@ class Recorder(ABC):
     def __init__(self, problem=None, method=None):
         self.problem = problem
         self.method = method
-        self.data = []
+        self.data: list[DataPoint] = []
         self._df = None
         self._best_result = None
         self._up_to_date = False
@@ -43,15 +44,21 @@ class Recorder(ABC):
         if self._df is None:
             if len(self.data) == 0:
                 raise Exception("Error occurred. No data to generate data frame.")
-            columns = []
-            if self._multiprocessing:
-                columns += ["batch"]
-            columns += self.problem.variable_names
-            columns += [f"inter_{i}" for i in range(len(self.data[0]) - self.problem.num_variables - 1)]
-            columns += ["metric"]
-            self._df = pd.DataFrame(self.data, columns=columns)
+            columns = self._get_dataframe_column_names()
+            data = [dat.data_chunk for dat in self.data]
+            self._df = pd.DataFrame(data, columns=columns)
 
         return self._df
+
+    def _get_dataframe_column_names(self) -> list[str]:
+        columns = []
+        if self.data[0].iteration is not None:
+            columns += ["iteration"]
+        columns += self.problem.variable_names
+        if self.data[0].has_metric:
+            columns += [f"inter_{i}" for i in range(len(self.data[0].result))]
+        columns += ["metric"]
+        return columns
 
     def _get_best_result(self):
         if self.problem.type_ == OptimizationType.MAX:

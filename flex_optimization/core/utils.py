@@ -1,7 +1,10 @@
 import copy
 import multiprocessing
+from functools import wraps
 
 import numpy as np
+
+from flex_optimization.core.recorder import Recorder
 
 
 class PoolHandler:
@@ -64,3 +67,23 @@ class PoolHandler:
 def custom_formatwarning(msg, *args, **kwargs):
     # ignore everything except the message
     return str(msg) + '\n'
+
+
+def save_if_error(func):
+    """
+    This function decorator will trigger the recorder to save the data if there is an error.
+    """
+    @wraps(func)
+    def _save_if_error(*args, **kwargs):  # first arg (it is self)
+        recorder: Recorder = args[0].recorder
+        try:
+            return func(*args, **kwargs)
+
+        except KeyboardInterrupt as e:  # keyboard interrupt is not an Exception
+            recorder._error_exit(e)
+
+        except Exception as e:
+            print(e)
+            recorder._error_exit(e)
+
+    return _save_if_error

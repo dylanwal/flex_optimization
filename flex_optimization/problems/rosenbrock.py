@@ -7,7 +7,7 @@ from flex_optimization.problems import ProblemClassification
 from flex_optimization.problems.utils import to_numpy_array
 
 
-def rosenbrock(args, constant: float = 10) -> np.ndarray:
+def rosenbrock(args: list[float], constant: float = 10) -> float:
     """
     Rosenbrock function
 
@@ -21,8 +21,7 @@ def rosenbrock(args, constant: float = 10) -> np.ndarray:
     Parameters
     ----------
     args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:] (second index determines dimensionality)
-        the number of values determines dimensionality
+        [x, y, z, ...] (length determines dimensionality)
     constant: float
         constant
 
@@ -32,15 +31,13 @@ def rosenbrock(args, constant: float = 10) -> np.ndarray:
         z value
 
     """
-    args = to_numpy_array(args)
-    d = args.shape[1]
-    n = args.shape[0]
+    d = len(args)
     if d % 2 != 0:
         raise ValueError("Rosenbrock requires even dimensions. Use 'rosebrock_varient' for non-even dimensions.")
 
-    sum_ = np.zeros(n)
+    sum_ = 0
     for i in range(1, int(d/2)+1):
-        sum_ += constant * (args[:, 2*i-2]**2 - args[:, 2*i-1])**2 + (args[:, 2*i-2]-1)**2
+        sum_ += constant * (args[2*i-2]**2 - args[2*i-1])**2 + (args[2*i-2]-1)**2
     return constant*d + sum_
 
 
@@ -73,7 +70,7 @@ def local_run():
     zz = rosenbrock([xx, yy])
 
     import plotly.graph_objs as go
-    fig = go.Figure(go.Surface(x=x, y=y, z=zz.T.reshape(n, n)))
+    fig = go.Figure(go.Surface(x=x, y=y, z=zz.reshape(n, n).T))
     fig.add_trace(go.Scatter3d(x=[1], y=[1], z=[1], mode="markers", marker=dict(color="white", size=5)))
     # fig.write_image("imgs//rosenbrock.svg")
     fig.show()

@@ -1,15 +1,15 @@
+import math
 
 import numpy as np
 
 from flex_optimization import OptimizationType
 from flex_optimization.problems import ProblemClassification
-from flex_optimization.problems.utils import to_numpy_array
 
 
-def nd_gaussian(args,
+def nd_gaussian(args: list[float],
                 sigma: float | list[float] = None,
                 pre_factor: float = 1,
-                center: float | list[float] = None) -> np.ndarray:
+                center: float | list[float] = None) -> float:
     """
     n-dimensional Gaussian function
 
@@ -20,9 +20,8 @@ def nd_gaussian(args,
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:,:] (first index determines dimensionality)
-        the number of values determines dimensionality
+    args: list[float]
+        [x, y, z, ...] (length determines dimensionality)
     sigma: float, list[float]
         standard deviation
     pre_factor: float
@@ -32,35 +31,33 @@ def nd_gaussian(args,
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     """
-    args = to_numpy_array(args)
-    d = args.shape[1]
-    n = args.shape[0]
+    d = len(args)
 
     if sigma is not None:
         if len(sigma) != d:
             raise ValueError(f"args suggests a {d}-distribution, but {len(sigma)} sigma where provided.")
     else:
-        sigma = np.ones(d)
+        sigma = [1] * d
 
     if center is not None:
         if len(center) != d:
             raise ValueError(f"args suggests a {d}-distribution, but {len(center)} center where provided.")
     else:
-        center = np.zeros(d)
+        center = [0] * d
 
     def single_dim_exponent(x_, x0, sigma_):
         return (x_-x0)**2/(2*sigma_**2)
 
     if d == 1:
-        return pre_factor*np.exp(-single_dim_exponent(args, center, sigma))
+        return pre_factor*math.exp(-single_dim_exponent(args[0], center, sigma))
 
-    exponent = np.zeros(n)
-    for i in range(args.shape[1]):
-        exponent += single_dim_exponent(args[:, i], center[i], sigma[i])
+    exponent = 0
+    for i in range(d):
+        exponent += single_dim_exponent(args[i], center[i], sigma[i])
 
     return pre_factor*np.exp(-exponent)
 
@@ -96,7 +93,7 @@ def local_run():
     zz = nd_gaussian([xx, yy])
 
     import plotly.graph_objs as go
-    fig = go.Figure(go.Surface(x=x, y=y, z=zz.T.reshape(n, n)))
+    fig = go.Figure(go.Surface(x=x, y=y, z=zz.reshape(n, n).T))
     fig.add_trace(go.Scatter3d(x=[0], y=[0], z=[1], mode="markers", marker=dict(color="white", size=5)))
 
     # fig.write_image("imgs//gaussian.svg")
@@ -113,7 +110,7 @@ def local_run2():
     xx = xx.T.reshape(n*n*n)
     yy = yy.T.reshape(n*n*n)
     zz = zz.T.reshape(n*n*n)
-    aa = nd_gaussian([xx, yy, zz], sigma=[2, 2, 2])
+    aa = nd_gaussian([xx, yy, zz], sigma=[4, 1, 1])
 
     import plotly.express as px
     import pandas as pd
@@ -123,4 +120,4 @@ def local_run2():
 
 
 if __name__ == "__main__":
-    local_run()
+    local_run2()

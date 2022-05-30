@@ -3,10 +3,9 @@ import numpy as np
 
 from flex_optimization import OptimizationType
 from flex_optimization.problems import ProblemClassification
-from flex_optimization.problems.utils import to_numpy_array
 
 
-def sphere(args) -> np.ndarray:
+def sphere(args: list[float]) -> float:
     """
     Sphere function
 
@@ -22,23 +21,20 @@ def sphere(args) -> np.ndarray:
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...]
-        the number of values determines dimensionality
+    args: list[float]
+        [x, y, z, ...] (length determines dimensionality)
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     """
-    args = to_numpy_array(args)
-    d = args.shape[1]
-    n = args.shape[0]
+    d = len(args)
 
-    sum_ = np.zeros(n)
+    sum_ = 0
     for i in range(d):
-        sum_ += args[:, i]**2
+        sum_ += args[i]**2
 
     return sum_
 
@@ -72,7 +68,7 @@ def local_run():
     zz = sphere([xx, yy])
 
     import plotly.graph_objs as go
-    fig = go.Figure(go.Surface(x=x, y=y, z=zz.T.reshape(n, n)))
+    fig = go.Figure(go.Surface(x=x, y=y, z=zz.reshape(n, n).T))
     fig.add_trace(go.Scatter3d(x=[0], y=[0], z=[0], mode="markers", marker=dict(color="white", size=5)))
 
     # fig.write_image("imgs//sphere.svg")

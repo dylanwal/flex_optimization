@@ -1,33 +1,9 @@
 import time
 from datetime import datetime
 
-import numpy as np
-
+from flex_optimization.core.data_point import DataPoint
 from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.logger_ import logger
-
-
-def _obj_to_list(obj):
-    obj_ = []
-    if isinstance(obj, (list, tuple)):
-        for row in obj:
-            if isinstance(row, list):
-                obj_.append(row)
-            elif isinstance(row, tuple):
-                obj_.append(list(row))
-            elif isinstance(row, np.ndarray):
-                obj_.append(row.tolist())
-            elif isinstance(row, (int, float, str)):
-                obj_.append([row])
-    elif isinstance(obj, np.ndarray):
-        for i in obj:
-            obj_.append([i.tolist()])
-
-    return obj_
-
-
-def shape_check(point, result, metric) -> (list[list], list[list], list[list]):
-    return _obj_to_list(point), _obj_to_list(result), _obj_to_list(metric)
 
 
 class RecorderFull(Recorder):
@@ -92,43 +68,30 @@ class RecorderFull(Recorder):
         self.start_time = datetime.now()
         logger.info(f"\nOptimization Running | start:{self.start_time}")
 
-    def _record_evaluation(self, point, result, metric):
-        show_metric = True
-        show_iteration = False
-        if result == metric:
-            show_metric = False
-        if hasattr(self.method, "iteration_count"):
-            show_iteration = True
+    def _record_evaluation(self, data_point: DataPoint):
+        show_iteration = True if data_point.iteration is not None else False
 
         if self._first_eval:
             self._first_eval = False
-            self._create_header(show_metric, show_iteration)
+            self._create_header(data_point.has_metric, show_iteration)
 
-        point, result, metric = shape_check(point, result, metric)
-        for p, r, m in zip(point, result, metric):
-            # save data
-            if show_metric:
-                self.data.append(p + r)
-            else:
-                self.data.append(p + r + m)
+        # save data
+        self.data.append(data_point)
 
-            # send data to logger
-            mes = f"{self.num_data_points} |"
-            if show_iteration:
-                mes += f" {self.method.iteration_count} |"
-            mes += f" {p} --> {r}"
-            if show_metric:
-                mes += f" --> {m}"
-            logger.monitor(mes)
-            self.num_data_points += 1
-
+        # send data to logger
+        mes = f"{self.num_data_points} |"
+        if show_iteration:
+            mes += f" {self.method.iteration_count} |"
+        mes += data_point.__repr__()
+        logger.monitor(mes)
+        self.num_data_points += 1
         self._up_to_date = False
 
     def _create_header(self, show_metric: bool = False, show_iteration: bool = False):
         mes = "counter |"
         if show_iteration:
             mes += " iteration | "
-        mes += f"{[self.problem.variable_names]} --> result"
+        mes += f"{self.problem.variable_names} --> result"
         if show_metric:
             mes += " --> metric"
         logger.monitor(mes)

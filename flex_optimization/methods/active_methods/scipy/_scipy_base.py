@@ -80,15 +80,10 @@ class SciPyBase(ActiveMethod):
 
     def callback(self, *args, **kwargs):
         self.iteration_count += 1
-        point = []
-        result = []
-        metric = []
         for i in range(len(self.problem._temp_data)):
-            temp = self.problem._temp_data.pop(0)
-            point.append(temp[0])
-            result.append(temp[1])
-            metric.append(temp[2])
-        super()._tell(point, result, metric)
+            temp_datapoint = self.problem._temp_data.pop(0)
+            temp_datapoint.iteration = self.iteration_count
+            super()._tell(temp_datapoint)
 
     def _check_result(self, result):
         if result.success:

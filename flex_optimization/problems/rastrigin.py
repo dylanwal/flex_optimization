@@ -6,7 +6,7 @@ from flex_optimization.problems import ProblemClassification
 from flex_optimization.problems.utils import to_numpy_array
 
 
-def rastrigin(args, constant: float = 10) -> np.ndarray:
+def rastrigin(args: list[float], constant: float = 10) -> float:
     """
     Rastrigin function
 
@@ -20,24 +20,21 @@ def rastrigin(args, constant: float = 10) -> np.ndarray:
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:] (second index determines dimensionality)
-        the number of values determines dimensionality
+    args: list[float]
+        [x, y, z, ...] (length determines dimensionality)
     constant: float
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     """
-    args = to_numpy_array(args)
-    d = args.shape[1]
-    n = args.shape[0]
+    d = len(args)
 
-    sum_ = np.zeros(n)
-    for i in range(args.shape[1]):
-        sum_ += args[:, i]**2 - constant * np.cos(2 * np.pi * args[:, i])
+    sum_ = 0
+    for i in range(d):
+        sum_ += args[i]**2 - constant * np.cos(2 * np.pi * args[i])
 
     return constant*d + sum_
 
@@ -71,7 +68,7 @@ def local_run():
     zz = rastrigin([xx, yy])
 
     import plotly.graph_objs as go
-    fig = go.Figure(go.Surface(x=x, y=y, z=zz.T.reshape(n, n)))
+    fig = go.Figure(go.Surface(x=x, y=y, z=zz.reshape(n, n).T))
     fig.add_trace(go.Scatter3d(x=[0], y=[0], z=[0], mode="markers", marker=dict(color="white", size=5)))
     # fig.write_image("imgs//rastrigin.svg")
     fig.show()

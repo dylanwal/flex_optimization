@@ -10,10 +10,9 @@ problems = [i.func for i in fo_p.ProblemClassification.population]
 
 @pytest.mark.parametrize("problem", problems)
 def test_list_input(problem: Callable):
-    args = [[-5, -2, 0, 1, 3, 5], [-5, -2, 0, 1, 3, 5]]
+    args = [-5, -2]
     result = problem(args)
-    assert len(result.shape) == 1
-    assert result.shape[0] == 6
+    assert isinstance(result, float)
 
 
 @pytest.mark.parametrize("problem", problems)

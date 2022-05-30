@@ -12,9 +12,9 @@ This directory contains collection of classic and non-classical test problems fo
 |key | value|
 |---|---|
 |name | gaussian| 
-|func | <function nd_gaussian at 0x0000014126BF9990>| 
+|func | <function nd_gaussian at 0x000001CB8D61ED40>| 
 |type_ | OptimizationType.MAX| 
-|global_goal | <function goal at 0x0000014126BF9CF0>| 
+|global_goal | <function goal at 0x000001CB8D61EDD0>| 
 |range_ | (-5, 5)| 
 |local_min | 0| 
 |num_dim | (1, inf)| 
@@ -31,9 +31,8 @@ This directory contains collection of classic and non-classical test problems fo
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:,:] (first index determines dimensionality)
-        the number of values determines dimensionality
+    args: list[float]
+        [x, y, z, ...] (length determines dimensionality)
     sigma: float, list[float]
         standard deviation
     pre_factor: float
@@ -43,7 +42,7 @@ This directory contains collection of classic and non-classical test problems fo
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     
@@ -56,9 +55,9 @@ This directory contains collection of classic and non-classical test problems fo
 |key | value|
 |---|---|
 |name | ackley| 
-|func | <function ackley at 0x0000014126BF9EA0>| 
+|func | <function ackley at 0x000001CB8D61F130>| 
 |type_ | OptimizationType.MIN| 
-|global_goal | <function goal at 0x0000014126BFA050>| 
+|global_goal | <function goal at 0x000001CB8D61F1C0>| 
 |range_ | (-5, 5)| 
 |local_min | 100| 
 |num_dim | (1, inf)| 
@@ -80,13 +79,12 @@ This directory contains collection of classic and non-classical test problems fo
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:,:] (first index determines dimensionality)
-        the number of values determines dimensionality
+    args: list[float]
+        [x, y, z, ...] (length determines dimensionality)
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     
@@ -99,9 +97,9 @@ This directory contains collection of classic and non-classical test problems fo
 |key | value|
 |---|---|
 |name | rastrigin| 
-|func | <function rastrigin at 0x0000014126BFA3B0>| 
+|func | <function rastrigin at 0x000001CB8D61F520>| 
 |type_ | OptimizationType.MIN| 
-|global_goal | <function goal at 0x0000014126BFA440>| 
+|global_goal | <function goal at 0x000001CB8D61F880>| 
 |range_ | (-5.12, 5.12)| 
 |local_min | 100| 
 |num_dim | (1, inf)| 
@@ -121,14 +119,13 @@ This directory contains collection of classic and non-classical test problems fo
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:] (second index determines dimensionality)
-        the number of values determines dimensionality
+    args: list[float]
+        [x, y, z, ...] (length determines dimensionality)
     constant: float
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     
@@ -141,9 +138,9 @@ This directory contains collection of classic and non-classical test problems fo
 |key | value|
 |---|---|
 |name | sphere| 
-|func | <function sphere at 0x0000014126BFA7A0>| 
+|func | <function sphere at 0x000001CB8D61FC70>| 
 |type_ | OptimizationType.MIN| 
-|global_goal | <function goal at 0x0000014126BFA830>| 
+|global_goal | <function goal at 0x000001CB8D61FD00>| 
 |range_ | (-5, 5)| 
 |local_min | 0| 
 |num_dim | (1, inf)| 
@@ -165,13 +162,12 @@ This directory contains collection of classic and non-classical test problems fo
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...]
-        the number of values determines dimensionality
+    args: list[float]
+        [x, y, z, ...] (length determines dimensionality)
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     
@@ -184,9 +180,9 @@ This directory contains collection of classic and non-classical test problems fo
 |key | value|
 |---|---|
 |name | rosenbrock| 
-|func | <function rosenbrock at 0x0000014126BFAB90>| 
+|func | <function rosenbrock at 0x000001CB8D63C0D0>| 
 |type_ | OptimizationType.MIN| 
-|global_goal | <function goal at 0x0000014126BFAC20>| 
+|global_goal | <function goal at 0x000001CB8D63C160>| 
 |range_ | (-5, 5)| 
 |local_min | 100| 
 |num_dim | (2, inf)| 
@@ -206,8 +202,7 @@ This directory contains collection of classic and non-classical test problems fo
     Parameters
     ----------
     args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:] (second index determines dimensionality)
-        the number of values determines dimensionality
+        [x, y, z, ...] (length determines dimensionality)
     constant: float
         constant
 
@@ -226,9 +221,9 @@ This directory contains collection of classic and non-classical test problems fo
 |key | value|
 |---|---|
 |name | rosenbrock_variant| 
-|func | <function rosenbrock_variant at 0x0000014126BFADD0>| 
+|func | <function rosenbrock_variant at 0x000001CB8D63C310>| 
 |type_ | OptimizationType.MIN| 
-|global_goal | <function goal at 0x0000014126BFAE60>| 
+|global_goal | <function goal at 0x000001CB8D63C3A0>| 
 |range_ | (-5, 5)| 
 |local_min | 1| 
 |num_dim | (3, 7)| 
@@ -247,15 +242,14 @@ This directory contains collection of classic and non-classical test problems fo
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:] (second index determines dimensionality)
-        the number of values determines dimensionality
+    args: list[float
+        [x, y, z, ...] (length determines dimensionality)
     constant: float
         constant
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     

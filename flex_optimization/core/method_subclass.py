@@ -4,6 +4,8 @@ from flex_optimization.core.recorder import Recorder
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method import Method
 from flex_optimization.core.stop_criteria import StopCriteria
+from flex_optimization.core.data_point import DataPoint
+from flex_optimization.core.utils import save_if_error
 
 
 def temp_func(func, point):
@@ -20,40 +22,32 @@ class PassiveMethod(Method, ABC):
     def get_points(self):
         pass
 
+    @save_if_error
     def run(self):
         self.recorder.record(self.recorder.RUNNING)
 
-        try:
-            points = self.get_points()
-            self.number_points = len(points)
-            self.recorder.record(self.recorder.NOTES, text=f"\tNumber of evaluations to preform: {self.number_points}")
+        points = self.get_points()
+        self.number_points = len(points)
+        self.recorder.record(self.recorder.NOTES, text=f"\tNumber of evaluations to preform: {self.number_points}")
 
-            if self.multiprocess >= 1:
-                self._run_multiproessing(points)
-            else:
-                self._run_single(points)
+        if self.multiprocess >= 1:
+            self._run_multiprocessing(points)
+        else:
+            self._run_single(points)
 
-            self.recorder.record(self.recorder.FINISH)
+        self.recorder.record(self.recorder.FINISH)
 
-        except KeyboardInterrupt as e:
-            self.recorder._error_exit(e)
-
-        except Exception as e:
-            print(e)
-            self.recorder._error_exit(e)
-
-    def _run_single(self, points):
+    def _run_single(self, points: list[list[int | float | str]]):
         for point in points:
             result = self.problem.evaluate(point)
             metric = self.problem.metric(result)
-            self.recorder.record(self.recorder.EVALUATION, point=[point], result=result, metric=metric)
+            self.recorder.record(self.recorder.EVALUATION, data_point=DataPoint(point, result, metric))
 
-    def _run_multiproessing(self, points):
-
+    def _run_multiprocessing(self, points):
         def callback(results):
             point_, result = results
             metric = self.problem.metric(result)
-            self.recorder.record(self.recorder.EVALUATION, point=[point_], result=result, metric=metric)
+            self.recorder.record(self.recorder.EVALUATION, data_point=DataPoint(point_, result, metric))
 
         from functools import partial
         from flex_optimization.core.utils import PoolHandler
@@ -87,12 +81,13 @@ class ActiveMethod(Method, ABC):
     def get_point(self):
         pass
 
-    def run(self, guard_value: int = 1_000_000):
+    def run(self, guard_value: int = 10_000):
         """ Run optimization. """
         self.recorder.record(self.recorder.RUNNING)
         self.run_steps(guard_value)
         self.recorder.record(self.recorder.FINISH)
 
+    @save_if_error
     def run_steps(self, algo_steps: int = 1):
         """
         Step through optimization
@@ -111,35 +106,27 @@ class ActiveMethod(Method, ABC):
         if not self._flag_init:
             self.method_init()
 
-        try:
-            if self.multiprocess:
-                self._multi_run_step(algo_steps)
-                return
+        if self.multiprocess:
+            self._multi_run_step(algo_steps)
+            return
 
-            # main optimization loop
-            for _ in range(algo_steps):
-                self.iteration_count += 1
-                point = self.get_point()
-                result = self.problem.evaluate(point)
-                metric = self.problem.metric(result)
-                self._tell([point], result, metric)
-                if not self._check_stop_criterion():
-                    break
-
-        except KeyboardInterrupt as e:
-            self.recorder._error_exit(e)
-
-        except Exception as e:
-            print(e)
-            self.recorder._error_exit(e)
+        # main optimization loop
+        for _ in range(algo_steps):
+            self.iteration_count += 1
+            point = self.get_point()
+            result = self.problem.evaluate(point)
+            metric = self.problem.metric(result)
+            self._tell(DataPoint(point, result, metric, self.iteration_count))
+            if not self._check_stop_criterion():
+                break
 
     def _multi_run_step(self, step: int):
         """ Sub-classed for multiprocessing capabilities. """
         raise NotImplementedError("Multi-processing not implemented yet.")
 
-    def _tell(self, point, result, metric):
+    def _tell(self, data_point: DataPoint):
         """ Update optimizer with new values"""
-        self.recorder.record(self.recorder.EVALUATION, point=point, result=result, metric=metric)
+        self.recorder.record(self.recorder.EVALUATION, data_point=data_point)
 
     def _check_stop_criterion(self):
         """
@@ -167,3 +154,10 @@ class ActiveMethod(Method, ABC):
             stopping_results.append(criteria.evaluate(self))
 
         return any(stopping_results)
+
+    def _get_steps(self) -> int:
+        from flex_optimization.stop_criteria import StopFunctionEvaluation
+        for stop in self.stop_criterion:
+            if isinstance(stop, StopFunctionEvaluation):
+                return stop.num_eval
+        return 1_000_000

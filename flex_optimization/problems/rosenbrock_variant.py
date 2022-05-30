@@ -2,10 +2,9 @@ import numpy as np
 
 from flex_optimization import OptimizationType
 from flex_optimization.problems import ProblemClassification
-from flex_optimization.problems.utils import to_numpy_array
 
 
-def rosenbrock_variant(args, constant: float = 10) -> np.ndarray:
+def rosenbrock_variant(args, constant: float = 10) -> float:
     """
     Rosenbrock function - variant
 
@@ -18,27 +17,25 @@ def rosenbrock_variant(args, constant: float = 10) -> np.ndarray:
 
     Parameters
     ----------
-    args: array
-        [x[:], y[:], z[:], ...] or np.ndarray[:,:] (second index determines dimensionality)
-        the number of values determines dimensionality
+    args: list[float
+        [x, y, z, ...] (length determines dimensionality)
     constant: float
         constant
 
     Returns
     -------
-    return: np.ndarray
+    return: float
         z value
 
     """
-    args = to_numpy_array(args)
-    d = args.shape[1]
-    n = args.shape[0]
+    d = len(args)
+
     if 3 < d < 7:
         raise ValueError("Rosenbrock requires even dimensions. Use 'rosebrock_varient' for non-even dimensions.")
 
-    sum_ = np.zeros(n)
+    sum_ = 0
     for i in range(1, d):
-        sum_ += constant * (args[:, i] - args[:, i - 1] ** 2) ** 2 + (1 - args[:, i - 1]) ** 2
+        sum_ += constant * (args[i] - args[i - 1] ** 2) ** 2 + (1 - args[i - 1]) ** 2
     return constant * d + sum_
 
 
