@@ -1,18 +1,16 @@
-from abc import ABC
-
 import numpy as np
-from scipy.optimize import minimize
+from scipy import optimize
 
 from flex_optimization import OptimizationType, NotSupported
 from flex_optimization.core.recorder import Recorder
-from flex_optimization.core.utils import save_if_error
 from flex_optimization.core.variable import DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import ActiveMethod, StopCriteria
-from flex_optimization.stop_criteria import StopIterationEvaluation, StopAbsoluteChange
+from flex_optimization.stop_criteria import StopIterationEvaluation, StopAbsoluteChange, StopRelativeChange, \
+    StopFunctionEvaluation
 
 
-class SciPyBase(ActiveMethod, ABC):
+class MethodBroyden(ActiveMethod):
     """
     https://docs.scipy.org/doc/scipy/tutorial/optimize.html?highlight=bfgs#optimization-scipy-optimize
 
@@ -43,36 +41,35 @@ class SciPyBase(ActiveMethod, ABC):
         for stop in self.stop_criterion:
             if stop is isinstance(stop, list):
                 continue  # compound stop criteria evaluated in flex_optimization not scipy
-            if isinstance(stop, StopIterationEvaluation):
-                if 'options' in self.options:
-                    self.options["options"] = self.options["options"] | {"maxiter": stop.num_eval}
-                else:
-                    self.options["options"] = {"maxiter": stop.num_eval}
-
+            if isinstance(stop, StopFunctionEvaluation):
+                self.options["iter"] = stop.num_eval
             elif isinstance(stop, StopAbsoluteChange):
-                self.options["tol"] = stop.cut_off_value
+                self.options["f_tol"] = stop.cut_off_value
+            elif isinstance(stop, StopRelativeChange):
+                self.options["f_rtol"] = stop.cut_off_value
 
-        # add defaults
-        bounds = []
-        for var in self.problem.variables:
-            bounds.append([var.min_, var.max_])
-        self.options["bounds"] = bounds
-
-    @save_if_error
     def run_steps(self, algo_steps: int = 1):
         if not self._flag_init:
             self.method_init()
 
-        if self.problem.type_ == OptimizationType.MAX:
-            def maximize_func(*args, **kwargs):
-                return -1 * self.problem.evaluate_capture(*args, **kwargs)
+        try:
+            if self.problem.type_ == OptimizationType.MAX:
+                def maximize_func(*args, **kwargs):
+                    return -1 * self.problem.evaluate_capture(*args, **kwargs)
 
-            func = maximize_func
-        else:
-            func = self.problem.evaluate_capture
+                func = maximize_func
+            else:
+                func = self.problem.evaluate_capture
 
-        result = minimize(func, self.x0, method=self._method, callback=self.callback, **self.options)
-        self._check_result(result)
+            result = optimize.broyden1(func, self.x0, callback=self.callback, **self.options)
+            self._check_result(result)
+
+        except KeyboardInterrupt as e:
+            self.recorder._error_exit(e)
+
+        except Exception as e:
+            print(e)
+            self.recorder._error_exit(e)
 
     def callback(self, *args, **kwargs):
         self.iteration_count += 1
@@ -80,8 +77,6 @@ class SciPyBase(ActiveMethod, ABC):
             temp_datapoint = self.problem._temp_data.pop(0)
             temp_datapoint.iteration = self.iteration_count
             super()._tell(temp_datapoint)
-        if not self._check_stop_criterion():
-            return True
 
     def _check_result(self, result):
         if result.success:

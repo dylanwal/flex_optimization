@@ -1,7 +1,4 @@
-from abc import ABC
-
-import numpy as np
-from scipy.optimize import minimize
+from scipy import optimize
 
 from flex_optimization import OptimizationType, NotSupported
 from flex_optimization.core.recorder import Recorder
@@ -9,19 +6,22 @@ from flex_optimization.core.utils import save_if_error
 from flex_optimization.core.variable import DiscreteVariable
 from flex_optimization.core.problem import Problem
 from flex_optimization.core.method_subclass import ActiveMethod, StopCriteria
-from flex_optimization.stop_criteria import StopIterationEvaluation, StopAbsoluteChange
+from flex_optimization.stop_criteria import StopIterationEvaluation, StopAbsoluteChange, StopRelativeChange, \
+    StopFunctionEvaluation
 
 
-class SciPyBase(ActiveMethod, ABC):
+class MethodBasinHopping(ActiveMethod):
     """
-    https://docs.scipy.org/doc/scipy/tutorial/optimize.html?highlight=bfgs#optimization-scipy-optimize
+    Method: Basin Hopping
+
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.basinhopping.html#scipy.optimize.basinhopping
 
     """
 
     def __init__(self,
                  problem: Problem,
                  stop_criterion: StopCriteria | list[StopCriteria] | list[list[StopCriteria]],
-                 x0: list | tuple | np.ndarray,
+                 x0: list[float],
                  multiprocess: bool | int = False,
                  recorder: Recorder = None,
                  options: dict = None,
@@ -44,19 +44,11 @@ class SciPyBase(ActiveMethod, ABC):
             if stop is isinstance(stop, list):
                 continue  # compound stop criteria evaluated in flex_optimization not scipy
             if isinstance(stop, StopIterationEvaluation):
-                if 'options' in self.options:
-                    self.options["options"] = self.options["options"] | {"maxiter": stop.num_eval}
-                else:
-                    self.options["options"] = {"maxiter": stop.num_eval}
-
+                self.options["niter"] = stop.num_eval
             elif isinstance(stop, StopAbsoluteChange):
-                self.options["tol"] = stop.cut_off_value
-
-        # add defaults
-        bounds = []
-        for var in self.problem.variables:
-            bounds.append([var.min_, var.max_])
-        self.options["bounds"] = bounds
+                self.options["f_tol"] = stop.cut_off_value
+            elif isinstance(stop, StopRelativeChange):
+                self.options["f_rtol"] = stop.cut_off_value
 
     @save_if_error
     def run_steps(self, algo_steps: int = 1):
@@ -71,7 +63,7 @@ class SciPyBase(ActiveMethod, ABC):
         else:
             func = self.problem.evaluate_capture
 
-        result = minimize(func, self.x0, method=self._method, callback=self.callback, **self.options)
+        result = optimize.basinhopping(func, x0=self.x0, callback=self.callback, **self.options)
         self._check_result(result)
 
     def callback(self, *args, **kwargs):
@@ -84,10 +76,10 @@ class SciPyBase(ActiveMethod, ABC):
             return True
 
     def _check_result(self, result):
-        if result.success:
+        if result.minimization_failures == 0:
             return
 
-        self.recorder.record(self.recorder.WARNING, text="SciPy: " + result.message)
+        self.recorder.record(self.recorder.WARNING, text=f"SciPy: {result.message}")
 
     def get_point(self) -> list:
         raise NotImplementedError("This algorithm does not support this function. ")

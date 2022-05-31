@@ -35,6 +35,9 @@ def main():
     # method = fo.methods.MethodNelderMead(problem, stop_criterion=fo.stop_criteria.StopFunctionEvaluation(20), x0=[3, 3])
     # method = fo.methods.MethodPowell(problem, stop_criterion=fo.stop_criteria.StopFunctionEvaluation(20), x0=[3, 3])
     # method = fo.methods.MethodTrustConstraint(problem, stop_criterion=fo.stop_criteria.StopFunctionEvaluation(20), x0=[3, 3])
+    method = fo.methods.MethodDualAnneal(problem, stop_criterion=fo.stop_criteria.StopFunctionEvaluation(20))
+    # method = fo.methods.MethodBasinHopping(problem, stop_criterion=fo.stop_criteria.StopFunctionEvaluation(20), x0=[3, 3])
+
 
 
     # multiprocessing

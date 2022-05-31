@@ -40,6 +40,8 @@ from flex_optimization.methods.active_methods.sampler.latin_hypercube import Met
 
 # gradient based
 from flex_optimization.methods.active_methods.scipy.BFGS import MethodBFGS
+from flex_optimization.methods.active_methods.scipy.dual_anneal import MethodDualAnneal
+from flex_optimization.methods.active_methods.scipy.basinhopping import MethodBasinHopping
 
 # simplex based
 from flex_optimization.methods.active_methods.scipy.nelder_mead import MethodNelderMead
